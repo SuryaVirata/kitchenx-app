@@ -1,6 +1,6 @@
 # ADR 0001: Two apps in one monorepo
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-10-07
 **Source:** KitchenX PRD v0.4
 
