@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "kitchenx-app",
-    "slug": "kitchenx-app",
+    "name": "KitchenX",
+    "slug": "kitchenx-customer",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
