@@ -62,6 +62,8 @@ Planned libraries and decisions are listed in [docs/architecture.md](docs/archit
 corepack enable          # provides pnpm
 pnpm install
 pnpm customer            # customer app dev server
+pnpm customer:web        # customer web dev server; keep this terminal open for hot reload
+pnpm customer:web:clear  # same as above, but clears Metro cache first
 pnpm warehouse           # warehouse app dev server
 pnpm --filter @kitchenx/customer web
 pnpm typecheck

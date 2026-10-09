@@ -5,6 +5,8 @@
   "description": "KitchenX mobile monorepo: Customer (iOS, Android, Web) and Warehouse apps with shared packages.",
   "scripts": {
     "customer": "pnpm --filter @kitchenx/customer start",
+    "customer:web": "pnpm --filter @kitchenx/customer web",
+    "customer:web:clear": "pnpm --filter @kitchenx/customer web:clear",
     "warehouse": "pnpm --filter @kitchenx/warehouse start",
     "typecheck": "pnpm -r --if-present typecheck"
   },
