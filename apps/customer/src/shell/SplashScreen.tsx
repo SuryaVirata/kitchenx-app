@@ -15,7 +15,7 @@ import { Animated, Easing, Image, StyleSheet, Text, useWindowDimensions, View } 
  */
 
 const LOGO_ASPECT_RATIO = 3171 / 369;
-const LOGO_WIDTH_RATIO = 0.62;
+const LOGO_WIDTH_RATIO = 0.7;
 const LOGO_TOP_RATIO = 0.38;
 
 // The source photo's exact "cover" fit (scale 1) shows a faded/white band
@@ -119,10 +119,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   tagline: {
-    marginTop: 10,
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#000000',
+    marginTop: 18,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#17171A',
+    letterSpacing: 0.2,
     textAlign: 'center',
   },
 });

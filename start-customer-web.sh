@@ -13,9 +13,4 @@ export CHOKIDAR_USEPOLLING=1
 export WATCHPACK_POLLING=true
 export FAST_REFRESH=true
 
-while true; do
-  corepack pnpm --filter @kitchenx/customer web
-  echo
-  echo "KitchenX customer web dev server stopped. Restarting in 2 seconds..."
-  sleep 2
-done
+corepack pnpm --filter @kitchenx/customer web
