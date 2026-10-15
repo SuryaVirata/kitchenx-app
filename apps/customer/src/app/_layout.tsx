@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
+import { useFonts } from 'expo-font';
+import { Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/inter';
 import { StatusBar } from 'expo-status-bar';
+import { fontRole } from '../theme/theme';
 import { SplashScreen } from '../shell/SplashScreen';
 import { CustomerSessionProvider } from '../shell/CustomerSession';
 import { AppRouterProvider, useAppRouter } from '../shell/AppRouter';
 import { SplashReadyProvider, useSetSplashReady } from '../shell/SplashReady';
-import WelcomeRoute from './index';
 import LoginRoute from './(auth)/login';
 import OtpRoute from './(auth)/otp';
 import BusinessRoute from './(onboarding)/business';
@@ -18,6 +20,11 @@ const SPLASH_DURATION_MS = 2500;
 const SPLASH_FADE_DURATION_MS = 500;
 
 export default function RootLayout() {
+  const [fontsReady] = useFonts({
+    [fontRole.body]: Inter_400Regular,
+    [fontRole.heading]: Inter_700Bold,
+  });
+  if (!fontsReady) return null;
   return (
     <CustomerSessionProvider>
       <SplashReadyProvider>
@@ -53,8 +60,7 @@ function RootShell() {
 
   return (
     <View style={styles.root}>
-      {href === '/' ? <WelcomeRoute /> : null}
-      {href === '/login' ? <LoginRoute /> : null}
+        {href === '/' || href === '/login' ? <LoginRoute /> : null}
       {href === '/otp' ? <OtpRoute /> : null}
       {href === '/business' ? <BusinessRoute /> : null}
       {href === '/needs' ? <NeedsRoute /> : null}

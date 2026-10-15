@@ -4,7 +4,7 @@ Each file renders one screen from `src/features` or `src/shell`. Navigation live
 
 ```
 _layout.tsx                 session, splash, current route
-index.tsx                   welcome
+index.tsx                   opens login
 (auth)/login.tsx            mobile number
 (auth)/otp.tsx              one-time code
 (onboarding)/business.tsx   business type

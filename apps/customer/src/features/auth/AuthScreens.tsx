@@ -5,19 +5,19 @@ import {
   Platform,
   Pressable,
   StyleSheet,
-  Text,
-  TextInput,
   TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
+import { colors } from '../../theme/theme';
+import { Text, TextInput } from '../../ui/Text';
 
-const ORANGE = '#FF4F18';
+const ORANGE = colors.orange;
 export const BRAND_TITLE_GAP = 38;
-const HEADLINE = '#17171A';
+const HEADLINE = colors.ink;
 const MUTED = '#3A3A3E';
 const PLACEHOLDER = '#9AA0A6';
-const FIELD_BG = '#F3F4F6';
+const FIELD_BG = colors.field;
 const LINE = '#E8EAED';
 const ERROR = '#D92D20';
 const LOGO_ASPECT = 3171 / 369;
@@ -41,7 +41,7 @@ if (Platform.OS === 'web' && typeof document !== 'undefined') {
   }
 }
 
-const DARK = '#17171A';
+const DARK = colors.ink;
 
 const PERSON_SVG =
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${DARK}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5.4 19c.9-3.4 3.4-5.2 6.6-5.2s5.7 1.8 6.6 5.2"/></svg>`;
@@ -162,20 +162,22 @@ export function useBrandType() {
   };
 }
 
-export function AuthHeader({ onBack }: { onBack: () => void }) {
+export function AuthHeader({ onBack }: { onBack?: () => void }) {
   const { horizontalPadding, logoWidth, logoHeight } = useBrandType();
 
   return (
     <View style={[styles.header, { paddingHorizontal: horizontalPadding, minHeight: logoHeight }]}>
-      <TouchableOpacity
-        onPress={onBack}
-        accessibilityRole="button"
-        accessibilityLabel="Back"
-        hitSlop={12}
-        style={[styles.backBtn, { left: horizontalPadding, top: 43 + (logoHeight - 36) / 2 }]}
-      >
-        <Text style={styles.backCaret}>‹</Text>
-      </TouchableOpacity>
+      {onBack ? (
+        <TouchableOpacity
+          onPress={onBack}
+          accessibilityRole="button"
+          accessibilityLabel="Back"
+          hitSlop={12}
+          style={[styles.backBtn, { left: horizontalPadding, top: 43 + (logoHeight - 36) / 2 }]}
+        >
+          <Text style={styles.backCaret}>‹</Text>
+        </TouchableOpacity>
+      ) : null}
       <Image
         source={require('../../../assets/kitchenx-logo-trimmed.png')}
         resizeMode="contain"
@@ -352,7 +354,7 @@ export function LoginScreen({
   onBack,
   onCodeSent,
 }: {
-  onBack: () => void;
+  onBack?: () => void;
   onCodeSent?: (destination: MobileDestination) => void;
 }) {
   const brand = useBrandType();
@@ -1080,7 +1082,7 @@ const styles = StyleSheet.create({
   backCaret: {
     fontSize: 32,
     lineHeight: 32,
-    color: '#17171A',
+    color: HEADLINE,
     fontWeight: '300',
     marginTop: -4,
   },

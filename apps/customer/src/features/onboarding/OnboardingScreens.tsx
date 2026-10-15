@@ -6,18 +6,18 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
-  TextInput,
   TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
 import { AuthHeader, BRAND_TITLE_GAP, useBrandType } from '../auth/AuthScreens';
+import { colors } from '../../theme/theme';
+import { Text, TextInput } from '../../ui/Text';
 
-const ORANGE = '#FF4F18';
-const INK = '#17171A';
+const ORANGE = colors.orange;
+const INK = colors.ink;
 const MUTED = '#6B7280';
-const FIELD = '#F3F4F6';
+const FIELD = colors.field;
 const BENEFIT = '#1B9E4B';
 
 export type SocialSession = {
@@ -602,7 +602,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       web: { boxShadow: '0 8px 20px rgba(23, 23, 26, 0.05)' } as object,
       default: {
-        shadowColor: '#17171A',
+        shadowColor: '#141517',
         shadowOpacity: 0.05,
         shadowRadius: 12,
         shadowOffset: { width: 0, height: 6 },
@@ -622,7 +622,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       web: { boxShadow: '0 8px 20px rgba(23, 23, 26, 0.05)' } as object,
       default: {
-        shadowColor: '#17171A',
+        shadowColor: '#141517',
         shadowOpacity: 0.05,
         shadowRadius: 12,
         shadowOffset: { width: 0, height: 6 },

@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { Animated, Easing, Image, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Animated, Easing, Image, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { colors } from '../theme/theme';
+import { Text } from '../ui/Text';
 
 /**
  * Background and logo are the real approved brand assets, used as-is:
@@ -122,7 +124,7 @@ const styles = StyleSheet.create({
     marginTop: 18,
     fontSize: 14,
     fontWeight: '600',
-    color: '#17171A',
+    color: colors.ink,
     letterSpacing: 0.2,
     textAlign: 'center',
   },

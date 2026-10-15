@@ -13,11 +13,11 @@ type AppRouterValue = {
 const AppRouterContext = createContext<AppRouterValue | null>(null);
 
 function initialHref(): Href {
-  if (typeof window === 'undefined') return '/';
+  if (typeof window === 'undefined') return '/login';
   if (window.location.hash === '#delivery') return '/delivery';
   if (window.location.hash === '#business') return '/business';
   if (window.location.hash === '#shop') return '/shop';
-  return '/';
+  return '/login';
 }
 
 export function AppRouterProvider({ children }: { children: ReactNode }) {

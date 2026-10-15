@@ -5,18 +5,18 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
-  TextInput,
   TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
+import { colors } from '../../theme/theme';
+import { Text, TextInput } from '../../ui/Text';
 
-const ORANGE = '#F4571B';
-const INK = '#17171A';
+const ORANGE = colors.orange;
+const INK = colors.ink;
 const MUTED = '#6B7280';
 const LINE = '#F0F1F3';
-const FIELD = '#F4F5F7';
+const FIELD = colors.field;
 
 type Product = {
   id: string;
@@ -74,13 +74,13 @@ const BELL =
 const BAG =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#FF4F18" d="M7.1 8.2h9.8l-.75 10.1a1.6 1.6 0 0 1-1.6 1.45H9.45a1.6 1.6 0 0 1-1.6-1.45L7.1 8.2Z"/><path fill="none" stroke="#FF4F18" stroke-width="1.7" stroke-linecap="round" d="M9.3 8.2V6.7a2.7 2.7 0 0 1 5.4 0v1.5"/></svg>';
 const MENU =
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#17171A" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#141517" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
 const CART_LINE =
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#17171A" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 7.2h12.2l-.9 11.2a1.4 1.4 0 0 1-1.4 1.3H8.5a1.4 1.4 0 0 1-1.4-1.3L6.2 7.2Z"/><path d="M9 7.2V5.8a3 3 0 0 1 6 0v1.4"/></svg>';
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#141517" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 7.2h12.2l-.9 11.2a1.4 1.4 0 0 1-1.4 1.3H8.5a1.4 1.4 0 0 1-1.4-1.3L6.2 7.2Z"/><path d="M9 7.2V5.8a3 3 0 0 1 6 0v1.4"/></svg>';
 const CART_ORANGE =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FF4F18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 7.2h12.2l-.9 11.2a1.4 1.4 0 0 1-1.4 1.3H8.5a1.4 1.4 0 0 1-1.4-1.3L6.2 7.2Z"/><path d="M9 7.2V5.8a3 3 0 0 1 6 0v1.4"/></svg>';
 const BELL_LINE =
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#17171A" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 16.2h11.6l-1.1-2V10a4.7 4.7 0 0 0-9.4 0v4.2l-1.1 2Z"/><path d="M10 16.6a2 2 0 0 0 4 0"/></svg>';
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#141517" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 16.2h11.6l-1.1-2V10a4.7 4.7 0 0 0-9.4 0v4.2l-1.1 2Z"/><path d="M10 16.6a2 2 0 0 0 4 0"/></svg>';
 const LEAF =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FF4F18" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19s1.2-7.2 8.2-11.2C18 4.6 19.5 4.2 19.5 4.2S19 8.4 16 12c-2.6 3.1-7.2 5.2-11 7Z"/><path d="M9 14.5c1.6-1.2 3.4-2.6 5.2-4.6"/></svg>';
 const TAG =
@@ -123,8 +123,8 @@ function productsFor(filter: string) {
 }
 
 function tabSvg(name: 'home' | 'categories' | 'orders' | 'lists' | 'account', active: boolean) {
-  const color = active ? '#FF4F18' : '#9CA3AF';
-  const fill = active ? '#FF4F18' : 'none';
+  const color = active ? colors.orange : '#9CA3AF';
+  const fill = active ? colors.orange : 'none';
   const common = `xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"`;
   if (name === 'home') {
     return `<svg ${common}><path d="M4.2 11.2 12 4.6l7.8 6.6V20a1 1 0 0 1-1 1h-4.6v-5.6H9.8V21H5.2a1 1 0 0 1-1-1v-8.8Z" fill="${fill}"/></svg>`;
@@ -141,9 +141,9 @@ function tabSvg(name: 'home' | 'categories' | 'orders' | 'lists' | 'account', ac
   return `<svg ${common}><circle cx="12" cy="8" r="3.1" fill="${fill}"/><path d="M6.2 19.4c.7-3 2.9-4.6 5.8-4.6s5.1 1.6 5.8 4.6"/></svg>`;
 }
 const HEART =
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#F4571B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19.2s-6.2-3.9-6.2-8A3.5 3.5 0 0 1 12 8.3a3.5 3.5 0 0 1 6.2 2.9c0 4.1-6.2 8-6.2 8Z"/></svg>';
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FF4F18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19.2s-6.2-3.9-6.2-8A3.5 3.5 0 0 1 12 8.3a3.5 3.5 0 0 1 6.2 2.9c0 4.1-6.2 8-6.2 8Z"/></svg>';
 const HEART_ON =
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#F4571B" stroke="#F4571B" stroke-width="1.8" stroke-linejoin="round"><path d="M12 19.2s-6.2-3.9-6.2-8A3.5 3.5 0 0 1 12 8.3a3.5 3.5 0 0 1 6.2 2.9c0 4.1-6.2 8-6.2 8Z"/></svg>';
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FF4F18" stroke="#FF4F18" stroke-width="1.8" stroke-linejoin="round"><path d="M12 19.2s-6.2-3.9-6.2-8A3.5 3.5 0 0 1 12 8.3a3.5 3.5 0 0 1 6.2 2.9c0 4.1-6.2 8-6.2 8Z"/></svg>';
 const TRASH =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><path d="M5 7h14M9 7V5h6v2M8 7l1 12h6l1-12"/></svg>';
 const NOTE =
@@ -1116,7 +1116,7 @@ const styles = StyleSheet.create({
     padding: 8,
     ...Platform.select({
       web: { boxShadow: '0 6px 16px rgba(23, 23, 26, 0.05)' } as object,
-      default: { shadowColor: '#17171A', shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 1 },
+      default: { shadowColor: '#141517', shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 1 },
     }),
   },
   addonImage: { height: 72, borderRadius: 12, backgroundColor: FIELD, alignItems: 'center', justifyContent: 'center' },

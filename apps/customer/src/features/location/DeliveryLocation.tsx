@@ -7,15 +7,15 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
-  TextInput,
   View,
 } from 'react-native';
+import { colors } from '../../theme/theme';
+import { Text, TextInput } from '../../ui/Text';
 
-const ORANGE = '#FF4F18';
-const INK = '#17171A';
+const ORANGE = colors.orange;
+const INK = colors.ink;
 const MUTED = '#667085';
-const FIELD = '#F3F4F6';
+const FIELD = colors.field;
 
 const STATES = ['Telangana', 'Andhra Pradesh', 'Karnataka', 'Tamil Nadu', 'Maharashtra', 'Delhi'];
 

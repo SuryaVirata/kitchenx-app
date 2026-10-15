@@ -7,11 +7,12 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web",
-    "web:clear": "expo start --web --clear",
+    "web": "expo start --web --port 8081",
+    "web:clear": "expo start --web --port 8081 --clear",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@expo-google-fonts/inter": "^0.4.2",
     "@expo/metro-runtime": "~57.0.16",
     "@kitchenx/api-client": "workspace:*",
     "@kitchenx/auth": "workspace:*",
@@ -19,6 +20,7 @@
     "@kitchenx/ui": "workspace:*",
     "expo": "~57.0.22",
     "expo-constants": "~57.0.22",
+    "expo-font": "~57.0.4",
     "expo-linking": "~57.0.13",
     "expo-router": "~57.0.27",
     "expo-status-bar": "~57.0.1",
