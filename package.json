@@ -8,6 +8,8 @@
     "customer:web": "pnpm --filter @kitchenx/customer web",
     "customer:web:clear": "pnpm --filter @kitchenx/customer web:clear",
     "warehouse": "pnpm --filter @kitchenx/warehouse start",
+    "admin": "pnpm --filter @kitchenx/admin start",
+    "admin:web": "pnpm --filter @kitchenx/admin web",
     "typecheck": "pnpm -r --if-present typecheck"
   },
   "engines": {
