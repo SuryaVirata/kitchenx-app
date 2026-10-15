@@ -1,19 +1,17 @@
 # app (routes)
 
-Expo Router route files go here once Expo Router is added. Route files stay thin and re-export screens from `src/features/*`.
-
-Planned route groups:
+Each file renders one screen from `src/features` or `src/shell`. Navigation lives in `src/shell/AppRouter.tsx`.
 
 ```
-_layout.tsx            startup gate + providers
-(auth)/                login, OTP
-(onboarding)/          business type, details, documents, pending
-account-status         rejected / deactivated
-(app)/
-  (tabs)/              home, catalogue, cart, orders, account
-  product/[id], order/[id]/…, complaint/…, offers/…, services/…,
-  packaging/…, reports/…, bulk/…, outlets/…
-  talk-to-x            modal, reachable from every screen
+_layout.tsx                 session, splash, current route
+index.tsx                   welcome
+(auth)/login.tsx            mobile number
+(auth)/otp.tsx              one-time code
+(onboarding)/business.tsx   business type
+(onboarding)/needs.tsx      what the business buys
+(onboarding)/location.tsx   city and pin
+(shop)/shop.tsx             customer home
+(shop)/delivery.tsx         delivery location
 ```
 
-On web, `(app)/_layout.web.tsx` swaps the tab bar for a left sidebar (FR-CUST-101).
+Expo Router is the usual file-based router for Expo. It is installed, but this machine cannot bundle it: Windows Application Control blocks the `lightningcss` native module that Expo Router's web build requires. The route files above are the structure we follow until that module can load.

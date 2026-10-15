@@ -1,6 +1,6 @@
 # ADR 0001: Two apps in one monorepo
 
-**Status:** Accepted
+**Status:** Superseded. This repo now contains only the customer app.
 **Date:** 2026-10-07
 **Source:** KitchenX PRD v0.4
 
@@ -27,7 +27,6 @@ PRD v0.4 defines two mobile interfaces for Phase 1: the Customer App (also deliv
 Use one pnpm-workspace monorepo (this repo, `kitchenx-app`) with:
 
 - `apps/customer`: Expo app for iOS, Android and Web
-- `apps/warehouse`: Expo app, Android-first, no web target
 - `packages/api-client`, `packages/auth`, `packages/ui`, `packages/platform`: infrastructure only, no business logic
 - `tooling/*`: shared configuration
 

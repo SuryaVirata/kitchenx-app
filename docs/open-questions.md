@@ -6,7 +6,7 @@ PRD gaps that affect the mobile architecture. Each one needs an answer from the 
 |---|---|---|---|---|
 | 1 | Delivery agent | FR-CUST-097, FR-CUST-073, FR-FIN-037, FR-CUST-030 | Who records live location, per-item delivery consent, COD cash and "Delivered", and on which device? No driver persona exists. | Possibly a third app in `apps/` |
 | 2 | Warehouse Web Console | Section 04, FR-WH-059 | Is it Phase 1, and which screens does it have? | `kitchenx-dashboard` vs. this repo |
-| 3 | Warehouse connectivity | SYS-01, SYS-04, FR-WH-059 | What is Wi-Fi coverage on the floor, and what should happen during an outage? | `apps/warehouse/src/outbox` |
+| 3 | Warehouse connectivity | SYS-01, SYS-04, FR-WH-059 | What is Wi-Fi coverage on the floor, and what should happen during an outage? | Not in this repo |
 | 4 | Pack-station camera | FR-WH-051, FR-WH-056 | How does the app start and confirm the fixed-camera recording? Who uploads from the NAS? | `features/packing` |
 | 5 | Printing | FR-WH-057, FR-WH-060 | Printer models; who sends print jobs; counter printer for walk-in sales? | `features/packing`, `features/offline-sale` |
 | 6 | Barcode/QR standards | FR-WH-003, FR-WH-011, FR-WH-014 | Which symbologies? Vendor barcodes or KitchenX labels? Are racks and orders labelled? | `src/scanning` |

@@ -1,3 +1,0 @@
-{
-  "extends": ["expo/tsconfig.base", "@kitchenx/tsconfig/strict.json"]
-}
