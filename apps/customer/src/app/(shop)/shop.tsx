@@ -5,5 +5,13 @@ import { useCustomerSession } from '../../shell/CustomerSession';
 export default function ShopRoute() {
   const { push } = useAppRouter();
   const { city } = useCustomerSession();
-  return <ShopFlow city={city} onDeliver={() => push('/delivery')} />;
+  return (
+    <ShopFlow
+      city={city}
+      onDeliver={() => push('/delivery')}
+      onSetup={() => push('/setup')}
+      onEditDetails={() => push('/edit-details')}
+      onEditOutlet={() => push('/edit-outlet')}
+    />
+  );
 }

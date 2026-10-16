@@ -2,10 +2,11 @@
 name: kitchenx-customer-prototype
 description: >-
   Builds KitchenX customer mobile prototype screens with the existing UI and
-  UX. Use when adding or changing customer app screens, layout, navigation,
-  copy, or images in kitchenx-app, including requests about consistency,
-  phone or tablet layout, prototype data, brand guidelines, fonts, Gabriel Sans,
-  Degular, or handing the UI to a backend later.
+  UX. Use when the user attaches a screenshot, mockup, or reference and asks
+  to build or match a screen, and when adding or changing customer app
+  screens, layout, navigation, copy, or images in kitchenx-app. Also use for
+  consistency, phone or tablet layout, prototype data, brand guidelines,
+  fonts, Gabriel Sans, Degular, or handing the UI to a backend later.
 ---
 
 # KitchenX customer prototype
@@ -24,16 +25,26 @@ A later backend, possibly from another repo, should replace the local data only.
 
 Do not put screen layout back into a single root component. Do not switch the app entry to `expo-router/entry`. Expo Router is installed, but its web bundle needs the `lightningcss` native module, which Windows Application Control blocks on the current machine. Keep using `AppRouter`.
 
+## When the user attaches a screenshot
+
+The screenshot decides layout, order, copy, and what is on the screen. The KitchenX theme decides colour, type, buttons, fields, and cards.
+
+1. Read `apps/customer/src/theme/theme.ts` and reuse a nearby screen in `src/features` before writing a new one.
+2. Rebuild the screenshot with `colors` from the theme and `Text` / `TextInput` from `apps/customer/src/ui/Text.tsx`.
+3. Do not copy the screenshot's font, a second orange, glass, blur, or a desktop layout.
+4. Do not paste hex values or `fontFamily` into the screen. Weight 600 and above is the heading role. Other text is the body role.
+5. Keep it tappable with local data. Do not add a backend call.
+
 ## Visual rules
 
 Match the screens already in the app. Do not invent a new visual system.
 
-- Brand colours and font names live in `apps/customer/src/theme/theme.ts`. Import them. Do not paste a second copy of the hex values into a screen.
-- Background `#FFFFFF`.
-- Primary orange `#FF4F18` for buttons, active icons, prices, links, and focus.
+- Brand colours and font roles live in `apps/customer/src/theme/theme.ts`. Import `colors`. Do not paste a second copy of the hex values into a screen.
+- Background `colors.white` (`#FFFFFF`).
+- Primary orange `colors.orange` (`#FF4F18`) for buttons, active icons, prices, links, and focus.
 - Selected delivery mode `#1B2430` with white text. Unselected mode is light gray with dark text.
-- Text `#17171A`. Secondary text `#6B7280`.
-- Fields `#F3F4F6`, radius 16, no heavy borders.
+- Text `colors.ink` (`#141517`). Secondary text `#6B7280`.
+- Fields `colors.field` (`#F2F4F7`), radius 16, no heavy borders.
 - Selected card: 1.5px `#FF4F18` border, fill `#FFF1EC`.
 - Unselected card: white fill, border `#E4E6EB`.
 - Errors `#D92D20`. Positive status `#1B9E4B`.

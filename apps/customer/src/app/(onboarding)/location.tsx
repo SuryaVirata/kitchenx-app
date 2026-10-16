@@ -8,7 +8,7 @@ export default function LocationRoute() {
   return (
     <LocationScreen
       social={social}
-      onBack={() => (canGoBack() ? back() : replace('/needs'))}
+      onBack={() => (canGoBack() ? back() : replace('/business'))}
       onContinue={(next) => {
         setCity(next);
         push('/shop');

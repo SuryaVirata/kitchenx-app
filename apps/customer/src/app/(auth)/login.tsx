@@ -3,11 +3,11 @@ import { useAppRouter } from '../../shell/AppRouter';
 import { useCustomerSession } from '../../shell/CustomerSession';
 
 export default function LoginRoute() {
-  const { back, canGoBack, push } = useAppRouter();
+  const { back, canGoBack, replace, push } = useAppRouter();
   const { setDestination } = useCustomerSession();
   return (
     <LoginScreen
-      onBack={canGoBack() ? back : undefined}
+      onBack={canGoBack() ? back : () => replace('/')}
       onCodeSent={(next) => {
         setDestination(next);
         push('/otp');

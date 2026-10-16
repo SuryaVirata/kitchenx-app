@@ -4,7 +4,7 @@ import { useCustomerSession } from '../../shell/CustomerSession';
 
 export default function OtpRoute() {
   const { back, canGoBack, replace, push } = useAppRouter();
-  const { destination, businessType, setSocial } = useCustomerSession();
+  const { destination, setSocial } = useCustomerSession();
   if (!destination) return <Redirect href="/login" />;
   return (
     <OtpScreen
@@ -13,7 +13,7 @@ export default function OtpRoute() {
       onVerifying={() => undefined}
       onVerified={() => {
         setSocial(null);
-        push(businessType ? '/needs' : '/business');
+        push('/delivery');
       }}
     />
   );

@@ -2,7 +2,9 @@
 
 This repository is the customer mobile prototype only. Do not add admin or warehouse apps here.
 
-When building or changing screens, follow `.cursor/skills/kitchenx-customer-prototype/SKILL.md`. Match the existing UI. Keep screens tappable with local data. Leave backend connection for later, and keep the screen components reusable when that connection is added.
+When building or changing screens, follow `.cursor/skills/kitchenx-customer-prototype/SKILL.md`.
+
+If the user attaches a screenshot, use it for layout, order, and copy only. Paint it with the existing KitchenX theme in `apps/customer/src/theme/theme.ts` and `apps/customer/src/ui/Text.tsx`. Do not copy the screenshot's font or colours. Do not paste hex values or font names into a screen. Keep screens tappable with local data. Leave backend connection for later.
 
 The brand guidelines name the fonts. The PRD does not. The customer app is not using either brand font.
 

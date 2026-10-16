@@ -9,7 +9,7 @@ export default function NeedsRoute() {
     <BusinessNeedsScreen
       social={social}
       onBack={() => (canGoBack() ? back() : replace('/business'))}
-      onContinue={() => push('/location')}
+      onContinue={() => push('/shop')}
     />
   );
 }

@@ -18,7 +18,6 @@ const ORANGE = colors.orange;
 const INK = colors.ink;
 const MUTED = '#6B7280';
 const FIELD = colors.field;
-const BENEFIT = '#1B9E4B';
 
 export type SocialSession = {
   provider: 'Google' | 'Facebook';
@@ -28,17 +27,18 @@ export type SocialSession = {
 
 export type BusinessRegistration = 'registered' | 'unregistered';
 
-const LOGO_ASPECT = 3171 / 369;
-
 function strokeIcon(color: string, body: string) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
 }
 
 const DOC_ICON =
-  '<path d="M8 3.6h5.1L19 9.4V20a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 7 20V5.1A1.5 1.5 0 0 1 8.5 3.6Z"/><path d="M13 3.8V9.2h5.2"/><path d="M9.4 13h5.4M9.4 16.2h3.6"/>';
+  '<path d="M7 3.8h6.2L18.2 9v10.2A1.3 1.3 0 0 1 16.9 20.5H8.3A1.3 1.3 0 0 1 7 19.2V5.1A1.3 1.3 0 0 1 8.3 3.8Z"/><path d="M13 4v5h5"/><circle cx="16.2" cy="16.4" r="2.7"/><path d="m14.9 16.4 1 1 2.1-2.2"/>';
 const ID_ICON =
-  '<rect x="3.6" y="5" width="16.8" height="14" rx="2.2"/><circle cx="9" cy="11" r="1.7"/><path d="M6.5 16.1c.4-1.5 1.45-2.2 2.5-2.2s2.1.7 2.5 2.2"/><path d="M14 10.2h4M14 13.2h3"/>';
-const CHECK_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${BENEFIT}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7"/></svg>`;
+  '<rect x="4.2" y="5" width="15.6" height="14" rx="2"/><path d="M8 16.2 16 8.2"/><path d="M9 10h.1M8.2 13H12"/>';
+const TAG_ICON =
+  '<path d="M3.8 12.2 11 5h6.6v6.6l-7.4 7.4a1.5 1.5 0 0 1-2.1 0L3.8 14.4a1.6 1.6 0 0 1 0-2.2Z"/><circle cx="15.4" cy="8.2" r="1"/>';
+const CHART_ICON = '<path d="M5 19V10.5M10 19V6.5M15 19v-6.5M20 19H4"/>';
+const BOLT_ICON = '<path d="M13.2 3.2 6.2 13h5.2l-.8 7.8 7.4-11.2h-5.2l.4-6.4Z"/>';
 
 const NEEDS = [
   { id: 'produce', title: 'Fresh Produce', subtitle: 'Fruits and vegetables' },
@@ -184,11 +184,18 @@ export function BusinessTypeScreen({
   onClose: () => void;
   onContinue: (type: BusinessRegistration) => void | Promise<void>;
 }) {
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const pad = 20;
-  const art = Math.min(248, width - pad * 2, height < 720 ? 156 : 248);
-  const logoWidth = Math.min(176, width * 0.48);
-  const [selected, setSelected] = useState<BusinessRegistration | null>(initial ?? null);
+  const frame = Math.min(width, 440);
+  const content = frame - pad * 2;
+  const titleSlot = 178;
+  const artWidth = Math.round(Math.max(72, content - titleSlot));
+  const artHeight = Math.round(artWidth * (405 / 536));
+  const fullW = Math.round(artWidth * (640 / 536));
+  const fullH = Math.round(fullW * (426 / 640));
+  const cropLeft = Math.round(fullW * (51 / 640));
+  const cropTop = Math.round(fullH * (15 / 426));
+  const [selected, setSelected] = useState<BusinessRegistration | null>(initial ?? 'registered');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -212,16 +219,17 @@ export function BusinessTypeScreen({
   };
 
   return (
-    <View style={styles.root}>
-      <View style={[styles.btTop, { paddingHorizontal: pad, paddingTop: Platform.OS === 'web' ? 8 : 44 }]}>
+    <View style={[styles.root, styles.btFrame]}>
+      <View style={styles.btColumn}>
+      <View style={[styles.btTop, { paddingHorizontal: pad, paddingTop: Platform.OS === 'web' ? 12 : 44 }]}>
         <TouchableOpacity
           onPress={onClose}
           accessibilityRole="button"
-          accessibilityLabel="Close"
+          accessibilityLabel="Back"
           hitSlop={12}
           style={styles.btClose}
         >
-          <Text style={styles.btCloseMark}>×</Text>
+          <Text style={styles.btCloseMark}>‹</Text>
         </TouchableOpacity>
       </View>
       <ScrollView
@@ -230,19 +238,20 @@ export function BusinessTypeScreen({
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Image
-          source={require('../../../assets/business-stall.png')}
-          resizeMode="contain"
-          accessibilityLabel="KitchenX store"
-          style={{ width: art, height: art * (696 / 743), alignSelf: 'center' }}
-        />
-        <Image
-          source={require('../../../assets/kitchenx-logo-trimmed.png')}
-          resizeMode="contain"
-          accessibilityLabel="KITCHEN X"
-          style={{ width: logoWidth, height: logoWidth / LOGO_ASPECT, alignSelf: 'center', marginTop: 8 }}
-        />
-        <Text style={styles.btHeading}>Select your business type</Text>
+        <View style={styles.btHero}>
+          <View style={styles.btHeroCopy}>
+            <Text style={styles.btHeading}>Select your{'\n'}business type</Text>
+            <Text style={styles.btSub}>This helps us personalise your pricing, services and experience on KitchenX.</Text>
+          </View>
+          <View style={{ width: artWidth, height: artHeight, marginTop: -10, overflow: 'hidden' }}>
+            <Image
+              source={require('../../../assets/business-type-chef.png')}
+              resizeMode="stretch"
+              accessibilityLabel="Chef outside a fresh market stall"
+              style={{ width: fullW, height: fullH, marginLeft: -cropLeft, marginTop: -cropTop }}
+            />
+          </View>
+        </View>
         <View accessibilityRole="radiogroup" style={styles.btList}>
           <TypeCard
             title="I have GST or FSSAI"
@@ -251,8 +260,8 @@ export function BusinessTypeScreen({
             selected={selected === 'registered'}
             onPress={() => choose('registered')}
             benefits={[
-              'Better prices',
-              'Potential eligibility for credit, subject to verification and approval',
+              { icon: TAG_ICON, label: 'Better prices' },
+              { icon: CHART_ICON, label: 'Potential eligibility for credit, subject to verification and approval.' },
             ]}
           />
           <TypeCard
@@ -261,7 +270,7 @@ export function BusinessTypeScreen({
             icon={ID_ICON}
             selected={selected === 'unregistered'}
             onPress={() => choose('unregistered')}
-            benefits={['Easy onboarding (no documents required)']}
+            benefits={[{ icon: BOLT_ICON, label: 'Easy onboarding — no documents required.' }]}
           />
         </View>
       </ScrollView>
@@ -278,9 +287,10 @@ export function BusinessTypeScreen({
           {saving ? (
             <ActivityIndicator color="#FFFFFF" />
           ) : (
-            <Text style={[styles.btContinueLabel, !selected && styles.btContinueLabelOff]}>Continue</Text>
+            <Text style={[styles.btContinueLabel, !selected && styles.btContinueLabelOff]}>Continue  →</Text>
           )}
         </TouchableOpacity>
+      </View>
       </View>
     </View>
   );
@@ -299,9 +309,9 @@ function TypeCard({
   icon: string;
   selected: boolean;
   onPress: () => void;
-  benefits: string[];
+  benefits: { icon: string; label: string }[];
 }) {
-  const color = selected ? ORANGE : '#4B5563';
+  const tone = selected ? ORANGE : '#6B7280';
   return (
     <Pressable
       onPress={onPress}
@@ -311,23 +321,27 @@ function TypeCard({
       style={[styles.btCard, selected && styles.btCardOn]}
     >
       <View style={styles.btRow}>
-        <Icon svg={strokeIcon(color, icon)} size={22} />
+        <View style={[styles.btIconBubble, selected ? styles.btIconBubbleOn : null]}>
+          <Icon svg={strokeIcon(tone, icon)} size={24} />
+        </View>
         <View style={styles.btCopy}>
           <Text style={styles.btCardTitle}>{title}</Text>
           <Text style={styles.btCardSub}>{subtitle}</Text>
         </View>
-        <View style={[styles.btRadio, selected && styles.btRadioOn]}>{selected ? <View style={styles.btRadioDot} /> : null}</View>
-      </View>
-      {selected ? (
-        <View style={styles.btBenefits}>
-          {benefits.map((benefit) => (
-            <View key={benefit} style={styles.btBenefit}>
-              <Icon svg={CHECK_ICON} size={16} />
-              <Text style={styles.btBenefitText}>{benefit}</Text>
-            </View>
-          ))}
+        <View style={[styles.btRadio, selected && styles.btRadioOn]}>
+          {selected ? <View style={styles.btRadioDot} /> : <View style={styles.btRadioIdle} />}
         </View>
-      ) : null}
+      </View>
+      <View style={styles.btBenefits}>
+        {benefits.map((benefit) => (
+          <View key={benefit.label} style={styles.btBenefit}>
+            <View style={[styles.btMiniBubble, selected ? styles.btIconBubbleOn : null]}>
+              <Icon svg={strokeIcon(tone, benefit.icon)} size={16} />
+            </View>
+            <Text style={styles.btBenefitText}>{benefit.label}</Text>
+          </View>
+        ))}
+      </View>
     </Pressable>
   );
 }
@@ -757,42 +771,70 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   btTop: {
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
+    marginBottom: 40,
   },
   btClose: {
-    alignSelf: 'flex-end',
     width: 36,
     height: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 4,
   },
   btCloseMark: {
     fontSize: 28,
     lineHeight: 30,
     color: INK,
     fontWeight: '300',
+    marginLeft: -2,
+  },
+  btFrame: {
+    alignItems: 'center',
+  },
+  btColumn: {
+    width: '100%',
+    maxWidth: 440,
+    flex: 1,
+  },
+  btHero: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 18,
+  },
+  btHeroCopy: {
+    flex: 1,
+    paddingRight: 6,
   },
   btHeading: {
-    marginTop: 16,
-    textAlign: 'center',
-    fontSize: 24,
-    lineHeight: 30,
+    fontSize: 27,
+    lineHeight: 33,
     fontWeight: '800',
     color: INK,
-    letterSpacing: -0.3,
+    letterSpacing: -1.2,
+  },
+  btSub: {
+    marginTop: 10,
+    fontSize: 15,
+    lineHeight: 21,
+    fontWeight: '500',
+    color: MUTED,
   },
   btList: {
-    marginTop: 22,
-    gap: 12,
+    marginTop: 18,
+    gap: 14,
   },
   btCard: {
-    borderRadius: 16,
+    borderRadius: 18,
     borderWidth: 1.5,
     borderColor: '#E4E6EB',
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 14,
-    paddingVertical: 14,
+    backgroundColor: '#F6F7F9',
+    paddingHorizontal: 16,
+    paddingVertical: 18,
+  },
+  btCardTitle: {
+    fontSize: 17,
+    lineHeight: 22,
+    fontWeight: '800',
+    color: INK,
   },
   btCardOn: {
     borderColor: ORANGE,
@@ -802,16 +844,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  btIconBubble: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: FIELD,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  btIconBubbleOn: {
+    backgroundColor: colors.white,
+  },
+  btMiniBubble: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: FIELD,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   btCopy: {
     flex: 1,
     marginLeft: 12,
     marginRight: 10,
-  },
-  btCardTitle: {
-    fontSize: 16,
-    lineHeight: 21,
-    fontWeight: '800',
-    color: INK,
   },
   btCardSub: {
     marginTop: 2,
@@ -820,28 +875,34 @@ const styles = StyleSheet.create({
     color: MUTED,
   },
   btRadio: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 1.5,
-    borderColor: '#C5CAD3',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: colors.ink,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.white,
   },
   btRadioOn: {
     borderColor: ORANGE,
   },
   btRadioDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
     backgroundColor: ORANGE,
   },
+  btRadioIdle: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.ink,
+  },
   btBenefits: {
-    marginTop: 12,
-    marginLeft: 34,
-    gap: 8,
+    marginTop: 14,
+    paddingLeft: 56,
+    gap: 12,
   },
   btBenefit: {
     flexDirection: 'row',
@@ -850,9 +911,9 @@ const styles = StyleSheet.create({
   },
   btBenefitText: {
     flex: 1,
-    color: BENEFIT,
+    color: INK,
     fontSize: 14,
-    lineHeight: 19,
+    lineHeight: 20,
     fontWeight: '600',
   },
   btFooter: {

@@ -1,6 +1,8 @@
 import { createElement, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Animated,
+  Easing,
   Image,
   Platform,
   Pressable,
@@ -350,6 +352,18 @@ function formatDestination(code: string, national: string) {
   return `${code} ${national}`;
 }
 
+function IndiaFlag() {
+  return (
+    <View style={styles.indiaFlag} accessibilityLabel="India">
+      <View style={[styles.indiaBand, { backgroundColor: '#FF9933' }]} />
+      <View style={[styles.indiaBand, styles.indiaWhite]}>
+        <View style={styles.indiaChakra} />
+      </View>
+      <View style={[styles.indiaBand, { backgroundColor: '#138808' }]} />
+    </View>
+  );
+}
+
 export function LoginScreen({
   onBack,
   onCodeSent,
@@ -358,6 +372,10 @@ export function LoginScreen({
   onCodeSent?: (destination: MobileDestination) => void;
 }) {
   const brand = useBrandType();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const frameWidth = Math.min(windowWidth, 480);
+  const naturalHeight = frameWidth * (1024 / 911);
+  const heroHeight = Math.round(Math.min(windowHeight - 248, naturalHeight * 1.35));
   const [code, setCode] = useState('+91');
   const [national, setNational] = useState('');
   const [codesOpen, setCodesOpen] = useState(false);
@@ -383,56 +401,67 @@ export function LoginScreen({
   };
 
   return (
-    <View style={styles.root}>
-      <View>
-        <AuthHeader onBack={onBack} />
-        <Text
-          style={[
-            styles.headline,
-            {
-              fontSize: brand.headlineSize,
-              lineHeight: brand.headlineLineHeight,
-              marginTop: BRAND_TITLE_GAP + 144,
-              paddingHorizontal: brand.horizontalPadding,
-            },
-          ]}
-        >
-          Login
-        </Text>
-        <Text style={[styles.subtext, { paddingHorizontal: brand.horizontalPadding }]}>
-          Enter your mobile number to continue.
-        </Text>
+    <View style={[styles.root, styles.loginRoot]}>
+      <View style={[styles.loginHero, { height: heroHeight }]}>
+        <Image
+          source={require('../../../assets/login-hero.jpg')}
+          resizeMode="cover"
+          style={styles.loginPhoto}
+          accessibilityLabel="Fresh kitchen ingredients"
+        />
+        <View style={[styles.loginTop, { paddingHorizontal: brand.horizontalPadding }]}>
+          {onBack ? (
+            <TouchableOpacity onPress={onBack} accessibilityRole="button" accessibilityLabel="Back" hitSlop={12} style={styles.loginBack}>
+              <Text style={styles.loginBackMark}>‹</Text>
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.loginBack} />
+          )}
+          <Image
+            source={require('../../../assets/kitchenx-logo-trimmed.png')}
+            resizeMode="contain"
+            accessibilityLabel="KITCHEN X"
+            style={{ width: brand.logoWidth, height: brand.logoHeight }}
+          />
+          <View style={styles.loginBack} />
+        </View>
+        <View style={[styles.loginCopy, { paddingHorizontal: brand.horizontalPadding }]}>
+          <Text style={styles.loginHeroTitle}>Fresh Supplies{'\n'}for Growing{'\n'}Businesses</Text>
+          <Text style={styles.loginHeroCopy}>Quality ingredients, competitive prices and reliable delivery for your kitchen.</Text>
+        </View>
       </View>
-      <View style={[styles.form, { paddingHorizontal: brand.horizontalPadding }]}>
-        <View style={styles.phoneSplit}>
+      <View style={[styles.loginCard, { paddingHorizontal: brand.horizontalPadding }]}>
+        <Text style={styles.loginCardTitle}>Login</Text>
+        <Text style={styles.loginCardCopy}>Enter your mobile number to continue.</Text>
+        <View style={[styles.loginPhone, numberError ? styles.fieldError : null]}>
           <TouchableOpacity
-            style={styles.codeField}
+            style={styles.loginCode}
             onPress={() => setCodesOpen((open) => !open)}
             accessibilityRole="button"
             accessibilityLabel={`Country code ${code}`}
           >
+            {code === '+91' ? <IndiaFlag /> : null}
             <Text style={styles.codeText}>{code}</Text>
             <Text style={styles.codeCaret}>▾</Text>
           </TouchableOpacity>
-          <View style={[styles.numberField, numberError ? styles.fieldError : null]}>
-            <TextInput
-              value={national}
-              onChangeText={(value) => {
-                const next = digitsOnly(value).slice(0, code === '+91' ? 10 : 15);
-                setNational(next);
-                setRequestError(null);
-              }}
-              onBlur={() => setBlurred(true)}
-              placeholder="10-digit mobile number"
-              placeholderTextColor={PLACEHOLDER}
-              keyboardType="phone-pad"
-              inputMode="tel"
-              textContentType="telephoneNumber"
-              autoComplete="tel"
-              testID="login-mobile"
-              style={styles.phoneInput}
-            />
-          </View>
+          <View style={styles.loginDivider} />
+          <TextInput
+            value={national}
+            onChangeText={(value) => {
+              const next = digitsOnly(value).slice(0, code === '+91' ? 10 : 15);
+              setNational(next);
+              setRequestError(null);
+            }}
+            onBlur={() => setBlurred(true)}
+            placeholder="10-digit mobile number"
+            placeholderTextColor={PLACEHOLDER}
+            keyboardType="phone-pad"
+            inputMode="tel"
+            textContentType="telephoneNumber"
+            autoComplete="tel"
+            testID="login-mobile"
+            style={styles.phoneInput}
+          />
         </View>
         {codesOpen ? (
           <View style={styles.codeMenu}>
@@ -454,7 +483,7 @@ export function LoginScreen({
         ) : null}
         {numberError ? <Text style={styles.errorText}>{numberError}</Text> : null}
         {requestError ? <Text style={styles.errorText}>{requestError}</Text> : null}
-        <View style={{ marginTop: 18 }}>
+        <View style={{ marginTop: 16, marginBottom: 8 }}>
           <PrimaryButton label="Continue" onPress={continueLogin} loading={sending} />
         </View>
       </View>
@@ -488,7 +517,7 @@ export function OtpScreen({
   const [otp, setOtp] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [seconds, setSeconds] = useState(0);
+  const [seconds, setSeconds] = useState(120);
   const [agreed, setAgreed] = useState(false);
   const [whatsapp, setWhatsapp] = useState(false);
   const [showVerify, setShowVerify] = useState(false);
@@ -516,7 +545,7 @@ export function OtpScreen({
     onVerifying(true);
     try {
       await verifyCustomerOtp(destination.e164, otp);
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       onVerified();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'That code could not be verified. Try again.');
@@ -534,7 +563,7 @@ export function OtpScreen({
     setError(null);
     try {
       await requestCustomerOtp(destination.e164);
-      setSeconds(30);
+      setSeconds(120);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not resend the code.');
     } finally {
@@ -608,12 +637,41 @@ export function OtpScreen({
   );
 }
 
+function VerifySpinner() {
+  const spin = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.timing(spin, {
+        toValue: 1,
+        duration: 900,
+        easing: Easing.linear,
+        useNativeDriver: false,
+      }),
+    );
+    animation.start();
+    return () => animation.stop();
+  }, [spin]);
+
+  const rotate = spin.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  return (
+    <View style={styles.verifySpin} accessibilityLabel="Verifying">
+      <View style={styles.verifyRing} />
+      <Animated.View style={[styles.verifyArc, { transform: [{ rotate }] }]} />
+    </View>
+  );
+}
+
 export function VerifyingScreen({ onBack }: { onBack?: () => void }) {
   return (
     <View style={styles.root}>
       <AuthHeader onBack={onBack ?? (() => undefined)} />
       <View style={styles.verifyBody}>
-        <ActivityIndicator size="large" color={ORANGE} />
+        <VerifySpinner />
         <Text style={styles.verifyTitle}>Verifying your code...</Text>
         <Text style={styles.verifyCopy}>Please wait while we verify your number.</Text>
       </View>
@@ -1448,7 +1506,7 @@ const styles = StyleSheet.create({
     color: HEADLINE,
   },
   otpTitle: {
-    marginTop: BRAND_TITLE_GAP + 48,
+    marginTop: BRAND_TITLE_GAP + 60,
   },
   sentRow: {
     marginTop: 10,
@@ -1524,6 +1582,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 43,
   },
+  verifySpin: {
+    width: 76,
+    height: 76,
+  },
+  verifyRing: {
+    ...StyleSheet.absoluteFill,
+    borderRadius: 38,
+    borderWidth: 7,
+    borderColor: '#F6D2C6',
+  },
+  verifyArc: {
+    ...StyleSheet.absoluteFill,
+    borderRadius: 38,
+    borderWidth: 7,
+    borderColor: 'transparent',
+    borderTopColor: colors.orange,
+  },
   verifyBody: {
     flex: 1,
     alignItems: 'center',
@@ -1545,5 +1620,126 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: MUTED,
     textAlign: 'center',
+  },
+  loginRoot: {
+    paddingBottom: 0,
+    backgroundColor: colors.ink,
+    width: '100%',
+    maxWidth: 480,
+    alignSelf: 'center',
+  },
+  loginHero: {
+    overflow: 'hidden',
+  },
+  loginPhoto: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+  },
+  loginCopy: {
+    marginTop: 18,
+  },
+  loginTop: {
+    paddingTop: 18,
+    minHeight: 56,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  loginBack: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loginBackMark: {
+    color: colors.white,
+    fontSize: 32,
+    lineHeight: 32,
+    fontWeight: '300',
+    marginTop: -4,
+  },
+  loginHeroTitle: {
+    color: colors.white,
+    fontSize: 32,
+    lineHeight: 38,
+    fontWeight: '800',
+  },
+  loginHeroCopy: {
+    marginTop: 10,
+    color: colors.white,
+    fontSize: 15,
+    lineHeight: 21,
+    fontWeight: '500',
+    maxWidth: 300,
+  },
+  loginCard: {
+    flex: 1,
+    backgroundColor: colors.white,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    marginTop: -28,
+    paddingTop: 22,
+    paddingBottom: 20,
+  },
+  loginPhone: {
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: FIELD_BG,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    borderWidth: 1.5,
+    borderColor: 'transparent',
+  },
+  loginCode: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  loginDivider: {
+    width: 1,
+    height: 22,
+    backgroundColor: '#D0D5DD',
+    marginHorizontal: 12,
+  },
+  indiaFlag: {
+    width: 22,
+    height: 16,
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  indiaBand: {
+    flex: 1,
+  },
+  indiaWhite: {
+    backgroundColor: colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  indiaChakra: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: '#000080',
+  },
+  loginCardTitle: {
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: '800',
+    color: colors.ink,
+  },
+  loginCardCopy: {
+    marginTop: 6,
+    marginBottom: 16,
+    fontSize: 15,
+    lineHeight: 22,
+    fontWeight: '500',
+    color: MUTED,
   },
 });

@@ -9,12 +9,17 @@ import { CustomerSessionProvider } from '../shell/CustomerSession';
 import { AppRouterProvider, useAppRouter } from '../shell/AppRouter';
 import { SplashReadyProvider, useSetSplashReady } from '../shell/SplashReady';
 import LoginRoute from './(auth)/login';
+import WelcomeRoute from './index';
 import OtpRoute from './(auth)/otp';
 import BusinessRoute from './(onboarding)/business';
-import NeedsRoute from './(onboarding)/needs';
-import LocationRoute from './(onboarding)/location';
 import ShopRoute from './(shop)/shop';
 import DeliveryRoute from './(shop)/delivery';
+import SetupRoute from './(onboarding)/setup';
+import PanRoute from './(onboarding)/pan';
+import GstRoute from './(onboarding)/gst';
+import FssaiRoute from './(onboarding)/fssai';
+import EditDetailsRoute from './(onboarding)/edit-details';
+import EditOutletRoute from './(onboarding)/edit-outlet';
 
 const SPLASH_DURATION_MS = 2500;
 const SPLASH_FADE_DURATION_MS = 500;
@@ -60,19 +65,24 @@ function RootShell() {
 
   return (
     <View style={styles.root}>
-        {href === '/' || href === '/login' ? <LoginRoute /> : null}
+        {href === '/' ? <WelcomeRoute /> : null}
+        {href === '/login' ? <LoginRoute /> : null}
       {href === '/otp' ? <OtpRoute /> : null}
       {href === '/business' ? <BusinessRoute /> : null}
-      {href === '/needs' ? <NeedsRoute /> : null}
-      {href === '/location' ? <LocationRoute /> : null}
       {href === '/shop' ? <ShopRoute /> : null}
       {href === '/delivery' ? <DeliveryRoute /> : null}
+      {href === '/setup' ? <SetupRoute /> : null}
+      {href === '/pan' ? <PanRoute /> : null}
+      {href === '/gst' ? <GstRoute /> : null}
+      {href === '/fssai' ? <FssaiRoute /> : null}
+      {href === '/edit-details' ? <EditDetailsRoute /> : null}
+      {href === '/edit-outlet' ? <EditOutletRoute /> : null}
       {splashOverlayVisible ? (
         <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.splashOverlay, { opacity: splashOpacity }]}>
           <SplashScreen />
         </Animated.View>
       ) : null}
-      <StatusBar style={splashOverlayVisible ? 'light' : 'dark'} />
+      <StatusBar style={splashOverlayVisible || href === '/login' ? 'light' : 'dark'} />
     </View>
   );
 }

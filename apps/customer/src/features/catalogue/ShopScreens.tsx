@@ -175,7 +175,19 @@ function productById(id: string) {
   return PRODUCTS.find((item) => item.id === id);
 }
 
-export function ShopFlow({ city = 'Hyderabad', onDeliver }: { city?: string; onDeliver?: () => void }) {
+export function ShopFlow({
+  city = 'Hyderabad',
+  onDeliver,
+  onSetup,
+  onEditDetails,
+  onEditOutlet,
+}: {
+  city?: string;
+  onDeliver?: () => void;
+  onSetup?: () => void;
+  onEditDetails?: () => void;
+  onEditOutlet?: () => void;
+}) {
   const [screen, setScreen] = useState<'home' | 'category' | 'product' | 'cart' | 'list' | 'orders' | 'account' | 'alerts'>('home');
   const [tab, setTab] = useState<ShopTab>('home');
   const [productId, setProductId] = useState('tomato');
@@ -297,6 +309,11 @@ export function ShopFlow({ city = 'Hyderabad', onDeliver }: { city?: string; onD
         body="Account details are not connected yet."
         tab={tab}
         onTab={goTab}
+        links={[
+          onSetup ? { label: 'Restaurant setup', onPress: onSetup } : null,
+          onEditDetails ? { label: 'Edit details', onPress: onEditDetails } : null,
+          onEditOutlet ? { label: 'Edit outlet details', onPress: onEditOutlet } : null,
+        ].filter((item): item is { label: string; onPress: () => void } => Boolean(item))}
       />
     );
   }
@@ -897,12 +914,14 @@ function InfoScreen({
   tab,
   onTab,
   onBack,
+  links,
 }: {
   title: string;
   body: string;
   tab: ShopTab;
   onTab: (tab: ShopTab) => void;
   onBack?: () => void;
+  links?: { label: string; onPress: () => void }[];
 }) {
   return (
     <View style={styles.screen}>
@@ -917,6 +936,11 @@ function InfoScreen({
       </View>
       <View style={styles.infoBody}>
         <Text style={styles.emptyCopy}>{body}</Text>
+        {links?.map((link) => (
+          <TouchableOpacity key={link.label} onPress={link.onPress} accessibilityRole="button" style={styles.accountLink}>
+            <Text style={styles.accountLinkLabel}>{link.label}</Text>
+          </TouchableOpacity>
+        ))}
       </View>
       <TabBar tab={tab} onTab={onTab} />
     </View>
@@ -1150,6 +1174,8 @@ const styles = StyleSheet.create({
   qtyVal: { color: INK, fontWeight: '800' },
   results: { paddingTop: 16 },
   emptyCopy: { marginHorizontal: 16, marginTop: 16, color: MUTED, fontSize: 14, lineHeight: 20 },
+  accountLink: { marginHorizontal: 16, marginTop: 18 },
+  accountLinkLabel: { color: ORANGE, fontSize: 16, fontWeight: '800' },
   infoBody: { flex: 1, paddingTop: 8 },
   bannerList: { paddingTop: 8 },
   promoBanner: { width: '100%', aspectRatio: 724 / 272, marginBottom: 12, borderRadius: 16 },
