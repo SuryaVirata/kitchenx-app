@@ -1,5 +1,7 @@
-import { createElement, useState } from 'react';
+import { createElement, useEffect, useRef, useState } from 'react';
 import {
+  Animated,
+  Easing,
   Image,
   Platform,
   Pressable,
@@ -11,6 +13,7 @@ import {
 } from 'react-native';
 import { colors } from '../../theme/theme';
 import { Text, TextInput } from '../../ui/Text';
+import { useSplashReady } from '../../shell/SplashReady';
 
 const ORANGE = colors.orange;
 const INK = colors.ink;
@@ -23,26 +26,27 @@ type Product = {
   name: string;
   unit: string;
   price: number;
+  compareAt?: number;
+  minutes?: number;
   image: number;
   category: 'vegetables' | 'fruits' | 'leafy';
   fresh?: boolean;
 };
 
 const PRODUCTS: Product[] = [
-  { id: 'tomato', name: 'Tomato', unit: '1 kg', price: 40, image: require('../../../assets/shop/tomato.png'), category: 'vegetables', fresh: true },
-
-  { id: 'onion', name: 'Onion', unit: '1 kg', price: 32, image: require('../../../assets/shop/onion.png'), category: 'vegetables' },
-  { id: 'potato', name: 'Potato', unit: '1 kg', price: 28, image: require('../../../assets/shop/potato.png'), category: 'vegetables' },
-  { id: 'carrot', name: 'Carrot', unit: '1 kg', price: 36, image: require('../../../assets/shop/carrot.png'), category: 'vegetables' },
-  { id: 'cucumber', name: 'Cucumber', unit: '1 kg', price: 30, image: require('../../../assets/shop/cucumber.png'), category: 'vegetables' },
-  { id: 'capsicum', name: 'Capsicum', unit: '1 kg', price: 48, image: require('../../../assets/shop/capsicum.png'), category: 'vegetables' },
-  { id: 'cabbage', name: 'Cabbage', unit: '1 kg', price: 24, image: require('../../../assets/shop/cabbage.png'), category: 'vegetables' },
-  { id: 'cauli', name: 'Cauliflower', unit: '1 kg', price: 42, image: require('../../../assets/shop/cauli.png'), category: 'vegetables' },
-  { id: 'chilli', name: 'Green Chilli', unit: '250 g', price: 22, image: require('../../../assets/shop/chilli.png'), category: 'vegetables' },
-  { id: 'garlic', name: 'Garlic', unit: '250 g', price: 35, image: require('../../../assets/shop/garlic.png'), category: 'vegetables' },
-  { id: 'lemon', name: 'Lemon', unit: '500 g', price: 30, image: require('../../../assets/shop/lemon.png'), category: 'fruits', fresh: true },
-  { id: 'spinach', name: 'Spinach', unit: '1 bunch', price: 18, image: require('../../../assets/shop/spinach.png'), category: 'leafy', fresh: true },
-  { id: 'broccoli', name: 'Broccoli', unit: '1 kg', price: 60, image: require('../../../assets/shop/broccoli.png'), category: 'leafy' },
+  { id: 'tomato', name: 'Tomato (Desi)', unit: '1 kg', price: 40, compareAt: 48, minutes: 8, image: require('../../../assets/shop/tomato.png'), category: 'vegetables', fresh: true },
+  { id: 'onion', name: 'Onion (Indian)', unit: '1 kg', price: 32, compareAt: 38, minutes: 8, image: require('../../../assets/shop/onion.png'), category: 'vegetables' },
+  { id: 'potato', name: 'Potato', unit: '1 kg', price: 28, compareAt: 34, minutes: 8, image: require('../../../assets/shop/potato.png'), category: 'vegetables' },
+  { id: 'carrot', name: 'Carrot', unit: '1 kg', price: 36, compareAt: 42, minutes: 8, image: require('../../../assets/shop/carrot.png'), category: 'vegetables' },
+  { id: 'cucumber', name: 'Cucumber', unit: '1 kg', price: 30, compareAt: 36, minutes: 8, image: require('../../../assets/shop/cucumber.png'), category: 'vegetables' },
+  { id: 'capsicum', name: 'Capsicum (Green)', unit: '500 g', price: 48, compareAt: 56, minutes: 8, image: require('../../../assets/shop/capsicum.png'), category: 'vegetables' },
+  { id: 'cabbage', name: 'Cabbage', unit: '1 kg', price: 24, compareAt: 28, minutes: 8, image: require('../../../assets/shop/cabbage.png'), category: 'vegetables' },
+  { id: 'cauli', name: 'Cauliflower', unit: '1 kg', price: 42, compareAt: 48, minutes: 8, image: require('../../../assets/shop/cauli.png'), category: 'vegetables' },
+  { id: 'chilli', name: 'Green Chilli (Mirapakaya)', unit: '250 g', price: 22, compareAt: 26, minutes: 8, image: require('../../../assets/shop/chilli.png'), category: 'vegetables' },
+  { id: 'garlic', name: 'Garlic', unit: '250 g', price: 35, compareAt: 42, minutes: 8, image: require('../../../assets/shop/garlic.png'), category: 'vegetables' },
+  { id: 'lemon', name: 'Lemon', unit: '500 g', price: 30, compareAt: 36, minutes: 8, image: require('../../../assets/shop/lemon.png'), category: 'fruits', fresh: true },
+  { id: 'spinach', name: 'Spinach', unit: '1 bunch', price: 18, compareAt: 22, minutes: 8, image: require('../../../assets/shop/spinach.png'), category: 'leafy', fresh: true },
+  { id: 'broccoli', name: 'Broccoli', unit: '1 kg', price: 60, compareAt: 72, minutes: 8, image: require('../../../assets/shop/broccoli.png'), category: 'leafy' },
 ];
 
 const CATEGORIES = [
@@ -68,7 +72,7 @@ const CATEGORIES = [
 const PIN =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#FF4F18" d="M12 2.2a6.8 6.8 0 0 0-6.8 6.8c0 5 6.8 12.8 6.8 12.8s6.8-7.8 6.8-12.8A6.8 6.8 0 0 0 12 2.2Zm0 9.2a2.4 2.4 0 1 1 0-4.8 2.4 2.4 0 0 1 0 4.8Z"/></svg>';
 const SEARCH =
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#1A1A1E" stroke-width="2" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.1"/><path d="M15.6 15.6 20.4 20.4"/></svg>';
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FF4F18" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.4"/><path d="M15.4 15.4 20.6 20.6"/></svg>';
 const BELL =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FF4F18" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2v1.15"/><path d="M6.4 16.4h11.2"/><path d="M7.3 16.4V10a4.7 4.7 0 0 1 9.4 0v6.4"/><path d="M10.1 17.7a1.9 1.9 0 0 0 3.8 0"/><circle cx="17.35" cy="5.15" r="2.55" fill="#FF4F18" stroke="#fff" stroke-width="1.15"/><text x="17.35" y="6.2" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="3.15" font-weight="700" fill="#fff" stroke="none">1</text></svg>';
 const BAG =
@@ -76,7 +80,7 @@ const BAG =
 const MENU =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#141517" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
 const CART_LINE =
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#141517" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 7.2h12.2l-.9 11.2a1.4 1.4 0 0 1-1.4 1.3H8.5a1.4 1.4 0 0 1-1.4-1.3L6.2 7.2Z"/><path d="M9 7.2V5.8a3 3 0 0 1 6 0v1.4"/></svg>';
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#141517" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="20.2" r="1.35" fill="#141517" stroke="none"/><circle cx="18" cy="20.2" r="1.35" fill="#141517" stroke="none"/><path d="M2.4 3.2h2.2l2.3 11.4a1.8 1.8 0 0 0 1.8 1.45h8.7a1.8 1.8 0 0 0 1.75-1.4l1.5-6.8H5.6"/></svg>';
 const CART_ORANGE =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FF4F18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 7.2h12.2l-.9 11.2a1.4 1.4 0 0 1-1.4 1.3H8.5a1.4 1.4 0 0 1-1.4-1.3L6.2 7.2Z"/><path d="M9 7.2V5.8a3 3 0 0 1 6 0v1.4"/></svg>';
 const BELL_LINE =
@@ -104,7 +108,38 @@ const STARTERS = [
   { id: 'fresh', name: 'Fresh picks', image: require('../../../assets/shop/cat-capsicum.png') },
 ] as const;
 
-type ShopTab = 'home' | 'lists' | 'orders' | 'account';
+const HERO_BANNERS = [
+  { id: 'produce', title: 'Fresh Fruits & Vegetables', category: 'vegetables', image: require('../../../assets/banners/Fresh Fruits and Vegetables Banner.png') },
+  { id: 'essentials', title: 'Daily Essentials', category: 'rice', image: require('../../../assets/banners/Daily Essentials Grocery Banner.png') },
+  { id: 'dairy', title: 'Fresh Dairy', category: 'dairy', image: require('../../../assets/banners/Fresh Dairy Banner with Cheese and Milk.png') },
+  { id: 'protein', title: 'Meat, Poultry & Seafood', category: 'chicken', image: require('../../../assets/banners/Fresh Meat Poultry and Seafood.png') },
+  { id: 'snacks', title: 'Snacks & Beverages', category: 'drinks', image: require('../../../assets/banners/Snacks and Beverages Banner.png') },
+  { id: 'household', title: 'Household & Personal Care', category: 'household', image: require('../../../assets/banners/Household and Personal Care Banner.png') },
+] as const;
+
+const HOME_CATEGORIES = [
+  { id: 'vegetables', label: 'Fruits & Vegetables', tint: '#E8F5E9', image: require('../../../assets/Category_PNGs/03_fruits_vegetables.png') },
+  { id: 'dairy', label: 'Fresh Dairy', tint: '#E3F2FD', image: require('../../../assets/Category_PNGs/05_fresh_dairy.png') },
+  { id: 'rice', label: 'Atta, Rice & Pulses', tint: '#FFF3E0', image: require('../../../assets/Category_PNGs/18_rice_rice_products.png') },
+  { id: 'oils', label: 'Oils, Masala & Spices', tint: '#FFF9C4', image: require('../../../assets/Category_PNGs/13_edible_oils.png') },
+  { id: 'canned', label: 'Packaged Foods', tint: '#FCE4EC', image: require('../../../assets/Category_PNGs/10_canned_imported_items.png') },
+  { id: 'drinks', label: 'Beverages', tint: '#EDE7F6', image: require('../../../assets/Category_PNGs/14_beverages_mixers.png') },
+  { id: 'packaging', label: 'Packaging', tint: '#F4F5F7', image: require('../../../assets/Category_PNGs/04_packaging_material.png') },
+  { id: 'butter', label: 'Butter & Cheese', tint: '#E1F5FE', image: require('../../../assets/Category_PNGs/06_butter_cheese_more.png') },
+  { id: 'chicken', label: 'Chicken & Eggs', tint: '#FFEBEE', image: require('../../../assets/Category_PNGs/08_chicken_eggs.png') },
+  { id: 'spices', label: 'Masala & Sugar', tint: '#FFF9C4', image: require('../../../assets/Category_PNGs/07_masala_salt_sugar.png') },
+  { id: 'sauces', label: 'Sauces', tint: '#FFF3E0', image: require('../../../assets/Category_PNGs/09_sauces_seasoning.png') },
+  { id: 'frozen', label: 'Frozen Food', tint: '#E0F7FA', image: require('../../../assets/Category_PNGs/12_frozen_instant_food.png') },
+] as const;
+
+function glyph(body: string, color: string) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
+}
+
+const CALENDAR = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="2.2" y="4.4" width="15.6" height="15" rx="2.8" fill="#FF4F18"/><rect x="4" y="8" width="12" height="9.4" rx="1.3" fill="#FFFFFF"/><rect x="6" y="2.4" width="1.8" height="3.6" rx="0.9" fill="#FF4F18"/><rect x="12.2" y="2.4" width="1.8" height="3.6" rx="0.9" fill="#FF4F18"/><path d="M6.2 10.6h7.6M6.2 13.2h7.6M6.2 15.6h4.8" stroke="#FFC7B8" stroke-width="1.15" stroke-linecap="round"/><circle cx="17.7" cy="16.6" r="4.5" fill="#FF4F18"/><circle cx="17.7" cy="16.6" r="3.15" fill="#FFFFFF"/><path d="M17.7 14.8v1.9l1.25.75" fill="none" stroke="#FF4F18" stroke-width="1.25" stroke-linecap="round"/></svg>`;
+const SCAN = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FF4F18" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8.2 3.2H4.6A1.4 1.4 0 0 0 3.2 4.6v3.6"/><path d="M15.8 3.2h3.6a1.4 1.4 0 0 1 1.4 1.4v3.6"/><path d="M8.2 20.8H4.6a1.4 1.4 0 0 1-1.4-1.4v-3.6"/><path d="M15.8 20.8h3.6a1.4 1.4 0 0 0 1.4-1.4v-3.6"/><rect x="7.4" y="7.4" width="3.6" height="3.6" rx="0.4" fill="#FF4F18" stroke="none"/><rect x="12.2" y="7.4" width="3.6" height="3.6" rx="0.4" fill="#FF4F18" stroke="none"/><rect x="7.4" y="12.2" width="3.6" height="3.6" rx="0.4" fill="#FF4F18" stroke="none"/><rect x="12.2" y="12.2" width="1.5" height="1.5" fill="#FF4F18" stroke="none"/><rect x="14.4" y="12.2" width="1.5" height="1.5" fill="#FF4F18" stroke="none"/><rect x="12.2" y="14.4" width="1.5" height="1.5" fill="#FF4F18" stroke="none"/><rect x="14.4" y="14.4" width="1.5" height="1.5" fill="#FF4F18" stroke="none"/></svg>`;
+
+type ShopTab = 'home' | 'explore' | 'lists' | 'orders' | 'account';
 
 function bannerFor(category: string) {
   if (['vegetables', 'fruits', 'leafy', 'chillies', 'fresh', 'onion', 'potato'].includes(category)) return PROMO_BANNERS[0];
@@ -117,28 +152,30 @@ function bannerFor(category: string) {
 }
 
 function productsFor(filter: string) {
-  if (filter === 'all') return PRODUCTS;
-  if (filter === 'fresh') return PRODUCTS.filter((item) => item.fresh);
-  return PRODUCTS.filter((item) => item.category === filter);
+  const alias: Record<string, string> = { butter: 'dairy', sauces: 'spices' };
+  const category = alias[filter] ?? filter;
+  if (category === 'all') return PRODUCTS;
+  if (category === 'fresh') return PRODUCTS.filter((item) => item.fresh);
+  return PRODUCTS.filter((item) => item.category === category);
 }
 
-function tabSvg(name: 'home' | 'categories' | 'orders' | 'lists' | 'account', active: boolean) {
+function tabSvg(name: 'home' | 'explore' | 'orders' | 'lists' | 'account', active: boolean) {
   const color = active ? colors.orange : '#9CA3AF';
   const fill = active ? colors.orange : 'none';
-  const common = `xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"`;
+  const common = `xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"`;
   if (name === 'home') {
-    return `<svg ${common}><path d="M4.2 11.2 12 4.6l7.8 6.6V20a1 1 0 0 1-1 1h-4.6v-5.6H9.8V21H5.2a1 1 0 0 1-1-1v-8.8Z" fill="${fill}"/></svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${fill}" stroke="${color}" stroke-width="1.8" stroke-linejoin="round"><path d="M3.6 11.2 12 4.2l8.4 7V20a1.2 1.2 0 0 1-1.2 1.2h-4.6v-6.2H9.4v6.2H4.8A1.2 1.2 0 0 1 3.6 20v-8.8Z"/></svg>`;
   }
-  if (name === 'categories') {
-    return `<svg ${common}><rect x="3.5" y="3.5" width="6.8" height="6.8" rx="1.9"/><rect x="13.7" y="3.5" width="6.8" height="6.8" rx="1.9"/><rect x="3.5" y="13.7" width="6.8" height="6.8" rx="1.9"/><rect x="13.7" y="13.7" width="6.8" height="6.8" rx="1.9"/></svg>`;
+  if (name === 'explore') {
+    return `<svg ${common}><rect x="3.4" y="3.4" width="7.2" height="7.2" rx="1.8"/><rect x="13.4" y="3.4" width="7.2" height="7.2" rx="1.8"/><rect x="3.4" y="13.4" width="7.2" height="7.2" rx="1.8"/><rect x="13.4" y="13.4" width="7.2" height="7.2" rx="1.8"/></svg>`;
   }
   if (name === 'orders') {
-    return `<svg ${common}><path d="M6.2 8.2h11.6l-.9 10.2a1.4 1.4 0 0 1-1.4 1.3H8.5a1.4 1.4 0 0 1-1.4-1.3L6.2 8.2Z" fill="${fill}"/><path d="M9 8.2V6.6a3 3 0 0 1 6 0v1.6"/></svg>`;
+    return `<svg ${common}><path d="M3.6 8.2 12 4.4l8.4 3.8L12 12 3.6 8.2Z"/><path d="M3.6 8.2V16l8.4 3.8L20.4 16V8.2"/><path d="M12 12v7.8"/></svg>`;
   }
   if (name === 'lists') {
-    return `<svg ${common}><path d="M12 19.2s-6.2-3.9-6.2-8A3.5 3.5 0 0 1 12 8.3a3.5 3.5 0 0 1 6.2 2.9c0 4.1-6.2 8-6.2 8Z" fill="${active ? color : 'none'}"/></svg>`;
+    return `<svg ${common}><rect x="6" y="3.4" width="12" height="17.2" rx="2"/><path d="M9.2 3.4h5.6v2.3H9.2z"/><path d="M9 10h6M9 13.2h6M9 16.4h4"/></svg>`;
   }
-  return `<svg ${common}><circle cx="12" cy="8" r="3.1" fill="${fill}"/><path d="M6.2 19.4c.7-3 2.9-4.6 5.8-4.6s5.1 1.6 5.8 4.6"/></svg>`;
+  return `<svg ${common}><circle cx="12" cy="8" r="3.2" fill="${fill}"/><path d="M5.6 19.6c.8-3.2 3.1-4.8 6.4-4.8s5.6 1.6 6.4 4.8"/></svg>`;
 }
 const HEART =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FF4F18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19.2s-6.2-3.9-6.2-8A3.5 3.5 0 0 1 12 8.3a3.5 3.5 0 0 1 6.2 2.9c0 4.1-6.2 8-6.2 8Z"/></svg>';
@@ -200,6 +237,7 @@ export function ShopFlow({
   const [query, setQuery] = useState('');
   const [mode, setMode] = useState<'standard' | 'express'>('standard');
   const [menu, setMenu] = useState(false);
+  const [cartBack, setCartBack] = useState<'home' | 'category'>('home');
 
   const cartCount = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
   const add = (id: string, qty = 1) => setCart((current) => ({ ...current, [id]: (current[id] ?? 0) + qty }));
@@ -231,6 +269,7 @@ export function ShopFlow({
     setTab(next);
     setMenu(false);
     if (next === 'home') setScreen('home');
+    if (next === 'explore') openBrowse();
     if (next === 'lists') setScreen('list');
     if (next === 'orders') setScreen('orders');
     if (next === 'account') setScreen('account');
@@ -248,9 +287,22 @@ export function ShopFlow({
           setTab('home');
           setScreen('home');
         }}
-        onOpenCart={() => setScreen('cart')}
+        onOpenCart={() => {
+          setCartBack('category');
+          setScreen('cart');
+        }}
         onOpen={(id) => openProduct(id, 'category')}
         onAdd={(id) => add(id, 1)}
+        onSetQty={setQty}
+        city={city}
+        mode={mode}
+        onMode={setMode}
+        onDeliver={onDeliver}
+        cart={cart}
+        saved={saved}
+        onToggleSaved={toggleSaved}
+        tab={tab}
+        onTab={goTab}
       />
     );
   }
@@ -276,7 +328,7 @@ export function ShopFlow({
         cart={cart}
         note={note}
         onNote={setNote}
-        onBack={() => setScreen('home')}
+        onBack={() => setScreen(cartBack)}
         onQty={setQty}
       />
     );
@@ -344,7 +396,10 @@ export function ShopFlow({
         onDeliver={onDeliver}
         onMenu={() => setMenu(true)}
         onAlerts={() => setScreen('alerts')}
-        onCart={() => setScreen('cart')}
+        onCart={() => {
+          setCartBack('home');
+          setScreen('cart');
+        }}
         onOpenCategory={openCategory}
         onBrowse={openBrowse}
         onOpenProduct={(id) => openProduct(id, 'home')}
@@ -381,6 +436,139 @@ export function ShopFlow({
           </View>
         </View>
       ) : null}
+    </View>
+  );
+}
+
+function HeroCarousel({ width, onOpen }: { width: number; onOpen: (id: string) => void }) {
+  const height = Math.round(width * (768 / 2048));
+  const index = useRef(0);
+  const paused = useRef(false);
+  const loaded = useRef<boolean[]>(HERO_BANNERS.map(() => false));
+  const [active, setActive] = useState(0);
+  const [under, setUnder] = useState(0);
+  const splashReady = useSplashReady();
+  const touch = useRef({ x: 0, y: 0, moved: false });
+
+  const show = (next: number) => {
+    const safe = (next + HERO_BANNERS.length) % HERO_BANNERS.length;
+    if (safe === index.current) return;
+    if (!loaded.current[safe]) return;
+    setUnder(index.current);
+    index.current = safe;
+    setActive(safe);
+  };
+
+  useEffect(() => {
+    if (!splashReady) return undefined;
+    const timer = setInterval(() => {
+      if (paused.current) return;
+      show((index.current + 1) % HERO_BANNERS.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [splashReady]);
+
+  return (
+    <View>
+      <View
+        style={[styles.promoClip, { height }]}
+        onTouchStart={(event) => {
+          paused.current = true;
+          touch.current = { x: event.nativeEvent.pageX, y: event.nativeEvent.pageY, moved: false };
+        }}
+        onTouchMove={(event) => {
+          const dx = Math.abs(event.nativeEvent.pageX - touch.current.x);
+          const dy = Math.abs(event.nativeEvent.pageY - touch.current.y);
+          if (dx > 12 || dy > 12) touch.current.moved = true;
+        }}
+        onTouchEnd={(event) => {
+          const delta = event.nativeEvent.pageX - touch.current.x;
+          if (delta <= -36) show(index.current + 1);
+          else if (delta >= 36) show(index.current - 1);
+          else if (!touch.current.moved) onOpen(HERO_BANNERS[index.current].category);
+          paused.current = false;
+        }}
+        accessibilityRole="button"
+        accessibilityLabel={`Shop ${HERO_BANNERS[active].title}`}
+      >
+        {HERO_BANNERS.map((item, itemIndex) => {
+          const visible = itemIndex === active || itemIndex === under;
+          return (
+            <View key={item.id} style={[styles.promoSlide, { opacity: visible ? 1 : 0, zIndex: itemIndex === active ? 2 : 1 }]}>
+              <Image
+                source={item.image}
+                style={{ width: '100%', height }}
+                resizeMode="cover"
+                fadeDuration={0}
+                onLoad={() => {
+                  loaded.current[itemIndex] = true;
+                }}
+              />
+            </View>
+          );
+        })}
+        <View style={[styles.shopNow, { pointerEvents: 'none' }]}>
+          <Text style={styles.shopNowText}>Shop now  ›</Text>
+        </View>
+      </View>
+      <View style={styles.dots}>
+        {HERO_BANNERS.map((item, dot) => (
+          <View key={item.id} style={[styles.dot, dot === active && styles.dotOn]} />
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function ModeSwitch({
+  mode,
+  onMode,
+  names,
+  segmentGap = 0,
+}: {
+  mode: 'standard' | 'express';
+  onMode: (mode: 'standard' | 'express') => void;
+  names?: [string, string];
+  segmentGap?: number;
+}) {
+  const slide = useRef(new Animated.Value(mode === 'express' ? 1 : 0)).current;
+  const [track, setTrack] = useState(0);
+  useEffect(() => {
+    Animated.timing(slide, {
+      toValue: mode === 'express' ? 1 : 0,
+      duration: 280,
+      easing: Easing.inOut(Easing.ease),
+      useNativeDriver: false,
+    }).start();
+  }, [mode, slide]);
+  const inner = Math.max(track - 8, 0);
+  const pill = Math.max((inner - segmentGap) / 2, 0);
+  const travel = slide.interpolate({ inputRange: [0, 1], outputRange: [0, pill + segmentGap] });
+  const options = [
+    { id: 'standard' as const, label: names?.[0] ?? 'On time', icon: (color: string) => glyph('<circle cx="12" cy="12" r="7.2"/><path d="M12 8.2V12l2.6 1.6"/>', color) },
+    { id: 'express' as const, label: names?.[1] ?? 'Minutes', icon: (color: string) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${color}"><path d="M13 2 4.5 13.2h6.2L10 22l9.5-12.2h-6.2L13 2z"/></svg>` },
+  ];
+  return (
+    <View style={[styles.mode, segmentGap > 0 ? { gap: segmentGap } : null]} onLayout={(event) => setTrack(event.nativeEvent.layout.width)}>
+      {pill > 0 ? (
+        <Animated.View pointerEvents="none" style={[styles.modePill, { width: pill, transform: [{ translateX: travel }] }]} />
+      ) : null}
+      {options.map((item) => {
+        const on = mode === item.id;
+        return (
+          <Pressable
+            key={item.id}
+            onPress={() => onMode(item.id)}
+            style={styles.modeBtn}
+            accessibilityRole="button"
+            accessibilityState={{ selected: on }}
+            accessibilityLabel={item.label}
+          >
+            <Icon svg={item.icon(on ? '#FFFFFF' : INK)} size={20} />
+            <Text style={[styles.modeText, on && styles.modeTextOn]}>{item.label}</Text>
+          </Pressable>
+        );
+      })}
     </View>
   );
 }
@@ -429,54 +617,43 @@ function HomeScreen({
   onTab: (tab: ShopTab) => void;
 }) {
   const { width } = useWindowDimensions();
-  const tile = Math.floor((width - 32 - 30) / 4);
+  const frame = width > 600 ? 480 : width;
+  const cols = 3;
+  const card = Math.floor((frame - 32 - 20) / cols);
   const q = query.trim().toLowerCase();
   const results = q
     ? PRODUCTS.filter((item) => item.name.toLowerCase().includes(q) || item.category.includes(q) || item.unit.toLowerCase().includes(q))
     : [];
+  const focusSearch = () => {
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      const node = document.querySelector('[data-testid="home-search"]') as { focus?: () => void } | null;
+      node?.focus?.();
+    }
+  };
   return (
-    <View style={styles.screen}>
-      <View style={[styles.header, { paddingTop: Platform.OS === 'web' ? 10 : 46 }]}>
-        <TouchableOpacity onPress={onMenu} accessibilityRole="button" accessibilityLabel="Menu" style={styles.iconBtn}>
-          <Icon svg={MENU} size={22} />
+    <View style={[styles.screen, width > 600 ? { width: 480, alignSelf: 'center' } : null, Platform.OS === 'web' ? { height: '100%', overflow: 'hidden' } : null]}>
+      <View style={[styles.homeTop, { paddingTop: Platform.OS === 'web' ? 18 : 50 }]}>
+        <TouchableOpacity onPress={onDeliver} accessibilityRole="button" accessibilityLabel="Delivery tomorrow" style={styles.deliver}>
+          <Icon svg={CALENDAR} size={30} />
+          <Text style={styles.deliveryTitle}>Delivery tomorrow</Text>
         </TouchableOpacity>
-        <Image
-          source={require('../../../assets/kitchenx-logo-trimmed.png')}
-          resizeMode="contain"
-          accessibilityLabel="KITCHEN X"
-          style={styles.headerLogo}
-        />
-        <View style={styles.homeActions}>
-          <TouchableOpacity accessibilityLabel="Wishlist" onPress={() => onTab('lists')} style={styles.iconBtn}>
-            <Icon svg={HEART} size={22} />
-          </TouchableOpacity>
-          <TouchableOpacity accessibilityLabel="Cart" onPress={onCart} style={styles.iconBtn}>
-            <Icon svg={CART_LINE} size={22} />
-            {cartCount > 0 ? (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{cartCount > 99 ? '99' : cartCount}</Text>
-              </View>
-            ) : null}
-          </TouchableOpacity>
-          <TouchableOpacity accessibilityLabel="Notifications" onPress={onAlerts} style={styles.iconBtn}>
-            <Icon svg={BELL_LINE} size={22} />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity accessibilityLabel="Cart" onPress={onCart} style={styles.cartBtn}>
+          <Icon svg={CART_LINE} size={22} />
+          {cartCount > 0 ? (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{cartCount > 99 ? '99' : cartCount}</Text>
+            </View>
+          ) : null}
+        </TouchableOpacity>
       </View>
       <ScrollView style={styles.homeScrollView} contentContainerStyle={styles.homeScroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-        <TouchableOpacity style={styles.address} onPress={onDeliver} accessibilityRole="button" accessibilityLabel="Delivery location">
-          <Icon svg={PIN} size={18} />
-          <View style={styles.addressCopy}>
-            <Text style={styles.deliverLabel}>Deliver to</Text>
-            <Text style={styles.deliverPlace} numberOfLines={1}>Main Kitchen, {city}</Text>
-          </View>
-        </TouchableOpacity>
+        <ModeSwitch mode={mode} onMode={onMode} />
         <View style={styles.search}>
-          <Icon svg={SEARCH} size={18} />
+          <Icon svg={SEARCH} size={22} />
           <TextInput
             value={query}
             onChangeText={onQuery}
-            placeholder="Search products, categories, brands..."
+            placeholder="Search 'CTC & Loose Tea'"
             placeholderTextColor="#9AA0A6"
             style={styles.searchInput}
             testID="home-search"
@@ -484,28 +661,9 @@ function HomeScreen({
             autoCorrect={false}
             autoCapitalize="none"
           />
-          {query ? (
-            <Pressable onPress={() => onQuery('')} accessibilityRole="button" accessibilityLabel="Clear search">
-              <Text style={styles.clearMark}>×</Text>
-            </Pressable>
-          ) : null}
-        </View>
-        <View style={styles.mode}>
-          {(['standard', 'express'] as const).map((id) => {
-            const on = mode === id;
-            return (
-              <Pressable
-                key={id}
-                onPress={() => onMode(id)}
-                style={[styles.modeBtn, on && styles.modeOn]}
-                accessibilityRole="button"
-                accessibilityState={{ selected: on }}
-                accessibilityLabel={id === 'standard' ? 'Standard' : 'Express'}
-              >
-                <Text style={[styles.modeText, on && styles.modeTextOn]}>{id === 'standard' ? 'Standard' : 'Express'}</Text>
-              </Pressable>
-            );
-          })}
+          <Pressable onPress={focusSearch} accessibilityRole="button" accessibilityLabel="Scan or search by image">
+            <Icon svg={SCAN} size={24} />
+          </Pressable>
         </View>
         {q ? (
           <View style={styles.results}>
@@ -524,86 +682,23 @@ function HomeScreen({
           </View>
         ) : (
           <>
-            <View style={styles.heroBanner}>
-              <View style={styles.heroCopy}>
-                <Text style={styles.heroTitle}>Fresh & Organic{'\n'}for your business</Text>
-                <Text style={styles.heroSub}>Farm fresh produce at great prices</Text>
-                <TouchableOpacity style={styles.heroBtn} onPress={() => onOpenCategory('vegetables')} accessibilityRole="button" accessibilityLabel="Shop Now">
-                  <Text style={styles.heroBtnText}>Shop Now  →</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={[styles.heroPhotos, width < 370 ? { width: 104 } : null]}>
-                <Image source={require('../../../assets/shop/capsicum.png')} style={styles.heroPhoto} resizeMode="contain" />
-                <Image source={require('../../../assets/shop/tomato.png')} style={[styles.heroPhoto, styles.heroPhotoMid]} resizeMode="contain" />
-                <Image source={require('../../../assets/shop/carrot.png')} style={styles.heroPhoto} resizeMode="contain" />
-              </View>
+            <View style={styles.heroWrap}>
+              <HeroCarousel width={frame - 32} onOpen={onOpenCategory} />
             </View>
-            <View style={styles.benefits}>
-              {([
-                [LEAF, 'Fresh Supplies'],
-                [TAG, 'Competitive Prices'],
-                [TRUCK, 'Reliable Delivery'],
-              ] as const).map(([icon, label]) => (
-                <View key={label} style={styles.benefit}>
-                  <Icon svg={icon} size={16} />
-                  <Text style={styles.benefitText} numberOfLines={2}>{label}</Text>
-                </View>
-              ))}
-            </View>
-            <SectionHead title="Starter Menu" onSeeAll={onBrowse} />
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hRow}>
-              {STARTERS.map((item) => (
-                <Pressable key={item.id} style={[styles.starterCard, { width: tile }]} onPress={() => onOpenCategory(item.id)} accessibilityRole="button" accessibilityLabel={item.name}>
-                  <View style={[styles.starterImage, { width: tile - 12, height: 52 }]}>
-                    <Image source={item.image} style={styles.starterPhoto} resizeMode="contain" />
+            <Text style={styles.catHead}>Shop by category</Text>
+            <View style={styles.catGrid}>
+              {HOME_CATEGORIES.map((item) => (
+                <Pressable key={item.id} style={[styles.catTile, { width: card }]} onPress={() => onOpenCategory(item.id)} accessibilityRole="button" accessibilityLabel={item.label}>
+                  <View style={[styles.catPhoto, { backgroundColor: item.tint }]}>
+                    <Image source={item.image} style={styles.catPhotoImage} resizeMode="contain" />
                   </View>
-                  <Text style={styles.starterName} numberOfLines={2}>{item.name}</Text>
+                  <View style={styles.catFoot}>
+                    <Text style={styles.catFootLabel} numberOfLines={2}>{item.label}</Text>
+                    <Text style={styles.catChevron}>›</Text>
+                  </View>
                 </Pressable>
               ))}
-            </ScrollView>
-            <SectionHead title="Shop by category" onSeeAll={onBrowse} />
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hRow}>
-              {CATEGORIES.map((item) => (
-                <Pressable key={item.id} style={[styles.starterCard, { width: tile }]} onPress={() => onOpenCategory(item.id)} accessibilityRole="button" accessibilityLabel={item.label}>
-                  <View style={[styles.starterImage, { width: tile - 12, height: 52 }]}>
-                    <Image source={item.image} style={item.fill ? styles.catImageFill : styles.starterPhoto} resizeMode={item.fill ? 'cover' : 'contain'} />
-                  </View>
-                  <Text style={styles.starterName} numberOfLines={2}>{item.label}</Text>
-                </Pressable>
-              ))}
-            </ScrollView>
-            <SectionHead title="Your Menu Add-ons" onSeeAll={() => onOpenCategory('all')} />
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hRow}>
-              {PRODUCTS.map((item) => {
-                const qty = cart[item.id] ?? 0;
-                return (
-                  <View key={item.id} style={styles.addonCard}>
-                    <Pressable onPress={() => onOpenProduct(item.id)} accessibilityRole="button" accessibilityLabel={item.name}>
-                      <View style={styles.addonImage}>
-                        <Image source={item.image} style={styles.addonPhoto} resizeMode="contain" />
-                        <Pressable
-                          style={styles.addonHeart}
-                          onPress={() => onToggleSaved(item.id)}
-                          accessibilityRole="button"
-                          accessibilityLabel={saved[item.id] ? `Remove ${item.name} from list` : `Save ${item.name}`}
-                        >
-                          <Icon svg={saved[item.id] ? HEART_ON : HEART} size={18} />
-                        </Pressable>
-                      </View>
-                      <Text style={styles.addonName} numberOfLines={2}>{item.name}</Text>
-                      <Text style={styles.addonUnit}>{item.unit}</Text>
-                      <Text style={styles.addonPrice}>₹{item.price}</Text>
-                    </Pressable>
-                    <AddControl
-                      qty={qty}
-                      onInc={() => (qty ? onSetQty(item.id, qty + 1) : onAdd(item.id))}
-                      onDec={() => onSetQty(item.id, qty - 1)}
-                      label={item.name}
-                    />
-                  </View>
-                );
-              })}
-            </ScrollView>
+            </View>
           </>
         )}
       </ScrollView>
@@ -627,8 +722,7 @@ function AddControl({ qty, onInc, onDec, label }: { qty: number; onInc: () => vo
   if (qty <= 0) {
     return (
       <TouchableOpacity style={styles.addBtn} onPress={onInc} accessibilityRole="button" accessibilityLabel={`Add ${label}`}>
-        <Icon svg={CART_ORANGE} size={14} />
-        <Text style={styles.addBtnText}>Add</Text>
+        <Text style={styles.addBtnText}>ADD</Text>
       </TouchableOpacity>
     );
   }
@@ -637,6 +731,278 @@ function AddControl({ qty, onInc, onDec, label }: { qty: number; onInc: () => vo
       <TouchableOpacity onPress={onDec} accessibilityRole="button" accessibilityLabel={`Decrease ${label}`}><Text style={styles.qtyMark}>−</Text></TouchableOpacity>
       <Text style={styles.qtyVal}>{qty}</Text>
       <TouchableOpacity onPress={onInc} accessibilityRole="button" accessibilityLabel={`Increase ${label}`}><Text style={styles.qtyMark}>+</Text></TouchableOpacity>
+    </View>
+  );
+}
+
+const LISTING_RAIL = [
+  { id: 'all', label: 'All', image: require('../../../assets/Category_PNGs/03_fruits_vegetables.png') },
+  { id: 'vegetables', label: 'Fresh Vegetables', image: require('../../../assets/Category_PNGs/03_fruits_vegetables.png') },
+  { id: 'fruits', label: 'Fresh Fruits', image: require('../../../assets/shop/cat-lemon.png') },
+  { id: 'leafy', label: 'Leafy Greens', image: require('../../../assets/shop/cat-spinach.png') },
+  { id: 'dairy', label: 'Fresh Dairy', image: require('../../../assets/Category_PNGs/05_fresh_dairy.png') },
+  { id: 'rice', label: 'Atta, Rice & Pulses', image: require('../../../assets/Category_PNGs/18_rice_rice_products.png') },
+  { id: 'oils', label: 'Oils, Masala & Spices', image: require('../../../assets/Category_PNGs/13_edible_oils.png') },
+  { id: 'canned', label: 'Packaged Foods', image: require('../../../assets/Category_PNGs/10_canned_imported_items.png') },
+  { id: 'drinks', label: 'Beverages', image: require('../../../assets/Category_PNGs/14_beverages_mixers.png') },
+  { id: 'chicken', label: 'Meat & Seafood', image: require('../../../assets/Category_PNGs/08_chicken_eggs.png') },
+  { id: 'packaging', label: 'Packaging', image: require('../../../assets/Category_PNGs/04_packaging_material.png') },
+  { id: 'butter', label: 'Butter & Cheese', image: require('../../../assets/Category_PNGs/06_butter_cheese_more.png') },
+  { id: 'spices', label: 'Masala & Sugar', image: require('../../../assets/Category_PNGs/07_masala_salt_sugar.png') },
+  { id: 'sauces', label: 'Sauces', image: require('../../../assets/Category_PNGs/09_sauces_seasoning.png') },
+  { id: 'frozen', label: 'Frozen Food', image: require('../../../assets/Category_PNGs/12_frozen_instant_food.png') },
+] as const;
+
+const SEARCH_HINT: Record<string, string> = {
+  all: 'Search products...',
+  vegetables: 'Search vegetables, leafy greens...',
+  fruits: 'Search fruits...',
+  leafy: 'Search leafy greens...',
+  dairy: 'Search milk, paneer, cheese...',
+  butter: 'Search milk, paneer, cheese...',
+  rice: 'Search atta, rice, pulses...',
+  oils: 'Search oils, masala, spices...',
+  spices: 'Search oils, masala, spices...',
+  sauces: 'Search sauces...',
+  canned: 'Search packaged foods...',
+  drinks: 'Search beverages...',
+  chicken: 'Search meat and seafood...',
+};
+
+const ALL_ICON =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FF4F18" stroke-width="1.8"><rect x="3" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.8"/></svg>';
+const SORT_ICON =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#667085" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h9M4 12h6M4 17h4"/><path d="M17 5v14M17 5l-2.2 2.2M17 5l2.2 2.2M17 19l-2.2-2.2M17 19l2.2-2.2"/></svg>';
+
+function savingPercent(price: number, compareAt?: number) {
+  if (!compareAt || compareAt <= price) return 0;
+  return Math.round(((compareAt - price) / compareAt) * 100);
+}
+
+function listingTitle(id: string) {
+  return LISTING_RAIL.find((item) => item.id === id)?.label ?? 'Category';
+}
+
+function ListingScreen({
+  filter,
+  onFilter,
+  city,
+  mode,
+  onMode,
+  onDeliver,
+  cart,
+  cartCount,
+  saved,
+  onToggleSaved,
+  onOpenCart,
+  onOpen,
+  onAdd,
+  onSetQty,
+  tab,
+  onTab,
+  onHome,
+}: {
+  filter: string;
+  onFilter: (id: string) => void;
+  city: string;
+  mode: 'standard' | 'express';
+  onMode: (mode: 'standard' | 'express') => void;
+  onDeliver?: () => void;
+  cart: Record<string, number>;
+  cartCount: number;
+  saved: Record<string, boolean>;
+  onToggleSaved: (id: string) => void;
+  onOpenCart: () => void;
+  onOpen: (id: string) => void;
+  onAdd: (id: string) => void;
+  onSetQty: (id: string, qty: number) => void;
+  tab: ShopTab;
+  onTab: (tab: ShopTab) => void;
+  onHome: () => void;
+}) {
+  const { width } = useWindowDimensions();
+  const rail = useRef<ScrollView>(null);
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState<'featured' | 'low' | 'high' | 'name'>('featured');
+  const [sortOpen, setSortOpen] = useState(false);
+  const q = query.trim().toLowerCase();
+  const items = productsFor(filter)
+    .filter((item) => !q || item.name.toLowerCase().includes(q) || item.unit.toLowerCase().includes(q))
+    .slice()
+    .sort((a, b) => {
+      if (sort === 'low') return a.price - b.price;
+      if (sort === 'high') return b.price - a.price;
+      if (sort === 'name') return a.name.localeCompare(b.name);
+      return 0;
+    });
+  const title = listingTitle(filter);
+  useEffect(() => {
+    const index = LISTING_RAIL.findIndex((item) => item.id === filter);
+    if (index >= 0) rail.current?.scrollTo({ y: Math.max(0, index * 98 - 24), animated: true });
+  }, [filter]);
+  return (
+    <View style={[styles.screen, Platform.OS === 'web' ? { height: '100%', overflow: 'hidden' } : null, width > 600 ? { width: 480, alignSelf: 'center' } : null]}>
+      <View style={[styles.shopHead, { paddingTop: Platform.OS === 'web' ? 12 : 46 }]}>
+        <View style={styles.shopBrand}>
+          <TouchableOpacity onPress={onHome} accessibilityRole="button" accessibilityLabel="KitchenX home">
+            <Image source={require('../../../assets/kitchenx-logo-trimmed.png')} style={styles.shopLogo} resizeMode="contain" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onDeliver} accessibilityRole="button" accessibilityLabel={`Deliver to ${city}`} style={styles.shopLoc}>
+            <Icon svg={PIN} size={16} />
+            <View style={styles.shopLocCopy}>
+              <Text style={styles.shopLocLabel}>Deliver to</Text>
+              <Text style={styles.shopLocCity} numberOfLines={1}>{city} ▾</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onOpenCart} accessibilityRole="button" accessibilityLabel="Cart" style={styles.cartBtn}>
+            <Icon svg={CART_LINE} size={24} />
+            {cartCount > 0 ? (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{cartCount > 99 ? '99' : cartCount}</Text>
+              </View>
+            ) : null}
+          </TouchableOpacity>
+        </View>
+        <View style={[styles.search, styles.listSearch]}>
+          <Icon svg={SEARCH} size={20} />
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder={SEARCH_HINT[filter] ?? 'Search products...'}
+            placeholderTextColor="#9AA0A6"
+            style={styles.searchInput}
+            testID="list-search"
+            returnKeyType="search"
+            autoCorrect={false}
+            autoCapitalize="none"
+          />
+          <Pressable
+            onPress={() => {
+              if (Platform.OS === 'web' && typeof document !== 'undefined') {
+                const node = document.querySelector('[data-testid="list-search"]') as { focus?: () => void } | null;
+                node?.focus?.();
+              }
+            }}
+            accessibilityRole="button"
+            accessibilityLabel="Scan or search by image"
+          >
+            <Icon svg={SCAN} size={22} />
+          </Pressable>
+        </View>
+      </View>
+      <View style={styles.shopBody}>
+        <ScrollView ref={rail} style={styles.rail} contentContainerStyle={styles.railContent} showsVerticalScrollIndicator={false}>
+          {LISTING_RAIL.map((item) => {
+            const on = filter === item.id;
+            return (
+              <Pressable
+                key={item.id}
+                onPress={() => {
+                  setQuery('');
+                  onFilter(item.id);
+                }}
+                style={[styles.railItem, on && styles.railItemOn]}
+                accessibilityRole="button"
+                accessibilityState={{ selected: on }}
+                accessibilityLabel={item.label}
+              >
+                <View style={[styles.railIcon, on && styles.railIconOn]}>
+                  {item.id === 'all' ? <Icon svg={ALL_ICON} size={26} /> : <Image source={item.image} style={styles.railPhoto} resizeMode="contain" />}
+                </View>
+                <Text style={[styles.railLabel, on && styles.railLabelOn]} numberOfLines={2}>{item.label}</Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+        <View style={styles.shopList}>
+          <View style={styles.listHead}>
+            <View style={styles.listHeadCopy}>
+              <Text style={styles.listTitle}>{title}</Text>
+              <Text style={styles.listCount}>{items.length} {items.length === 1 ? 'product' : 'products'}</Text>
+            </View>
+            <Pressable onPress={() => setSortOpen((open) => !open)} style={styles.sortBtn} accessibilityRole="button" accessibilityLabel="Sort products">
+              <Icon svg={SORT_ICON} size={16} />
+              <Text style={styles.sortText}>Sort</Text>
+            </Pressable>
+          </View>
+          {sortOpen ? (
+            <View style={styles.sortMenu}>
+              {([
+                ['featured', 'Catalogue order'],
+                ['low', 'Price: low to high'],
+                ['high', 'Price: high to low'],
+                ['name', 'Name'],
+              ] as const).map(([id, label]) => (
+                <Pressable
+                  key={id}
+                  onPress={() => {
+                    setSort(id);
+                    setSortOpen(false);
+                  }}
+                  style={styles.sortOption}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: sort === id }}
+                >
+                  <Text style={[styles.sortOptionText, sort === id && styles.sortOptionOn]}>{label}</Text>
+                </Pressable>
+              ))}
+            </View>
+          ) : null}
+          <ScrollView style={styles.shopListScroll} contentContainerStyle={styles.shopListContent} showsVerticalScrollIndicator={false}>
+          <View style={styles.productGrid}>
+            {items.map((item) => {
+              const qty = cart[item.id] ?? 0;
+              const off = savingPercent(item.price, item.compareAt);
+              return (
+                <View key={item.id} style={styles.gridCell}>
+                  <View style={styles.productCard}>
+                    <View style={styles.productPhoto}>
+                      <Pressable onPress={() => onOpen(item.id)} accessibilityRole="button" accessibilityLabel={item.name} style={styles.productHit}>
+                        <Image source={item.image} style={styles.productImage} resizeMode="contain" />
+                      </Pressable>
+                      {off > 0 ? (
+                        <View style={styles.offBadge}>
+                          <Text style={styles.offBadgeText}>{off}% OFF</Text>
+                        </View>
+                      ) : null}
+                    </View>
+                    <View style={styles.productBody}>
+                      {item.minutes ? (
+                        <View style={styles.minuteRow}>
+                          <Icon svg={glyph('<circle cx="12" cy="12" r="7"/><path d="M12 8.5V12l2.4 1.5"/>', MUTED)} size={12} />
+                          <Text style={styles.minuteText}>{item.minutes} MINS</Text>
+                        </View>
+                      ) : null}
+                      <Text style={styles.productName} numberOfLines={2}>{item.name}</Text>
+                      <Text style={styles.productUnit}>{item.unit}</Text>
+                      <View style={styles.priceLine}>
+                        <Text style={styles.productPrice}>₹{item.price}</Text>
+                        {item.compareAt ? <Text style={styles.compareAt}>₹{item.compareAt}</Text> : null}
+                      </View>
+                      <View style={styles.cardActions}>
+                        <TouchableOpacity
+                          onPress={() => onToggleSaved(item.id)}
+                          accessibilityRole="button"
+                          accessibilityLabel={saved[item.id] ? `Remove ${item.name} from list` : `Save ${item.name}`}
+                          style={styles.cardHeart}
+                        >
+                          <Icon svg={saved[item.id] ? HEART_ON : HEART} size={20} />
+                        </TouchableOpacity>
+                        <View style={styles.cardAdd}>
+                          <AddControl label={item.name} qty={qty} onDec={() => onSetQty(item.id, qty - 1)} onInc={() => onAdd(item.id)} />
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+          {!items.length ? <Text style={styles.emptyCopy}>No priced products are in this category yet.</Text> : null}
+          </ScrollView>
+        </View>
+      </View>
+      <TabBar tab={tab} onTab={onTab} />
     </View>
   );
 }
@@ -651,6 +1017,16 @@ function CategoryScreen({
   onOpenCart,
   onOpen,
   onAdd,
+  onSetQty,
+  city,
+  mode,
+  onMode,
+  onDeliver,
+  cart,
+  saved,
+  onToggleSaved,
+  tab,
+  onTab,
 }: {
   filter: string;
   browse: boolean;
@@ -661,11 +1037,62 @@ function CategoryScreen({
   onOpenCart: () => void;
   onOpen: (id: string) => void;
   onAdd: (id: string) => void;
+  onSetQty: (id: string, qty: number) => void;
+  city: string;
+  mode: 'standard' | 'express';
+  onMode: (mode: 'standard' | 'express') => void;
+  onDeliver?: () => void;
+  cart: Record<string, number>;
+  saved: Record<string, boolean>;
+  onToggleSaved: (id: string) => void;
+  tab: ShopTab;
+  onTab: (tab: ShopTab) => void;
 }) {
+  if (!browse) {
+    return (
+      <ListingScreen
+        filter={filter}
+        onFilter={onFilter}
+        city={city}
+        mode={mode}
+        onMode={onMode}
+        onDeliver={onDeliver}
+        cart={cart}
+        cartCount={cartCount}
+        saved={saved}
+        onToggleSaved={onToggleSaved}
+        onOpenCart={onOpenCart}
+        onOpen={onOpen}
+        onAdd={onAdd}
+        onSetQty={onSetQty}
+        tab={tab}
+        onTab={onTab}
+        onHome={onBack}
+      />
+    );
+  }
   const items = productsFor(filter);
   const chips = ['all', 'vegetables', 'fruits', 'leafy', 'fresh'];
   const known = CATEGORIES.find((item) => item.id === filter);
-  const title = browse ? 'Categories' : filter === 'all' ? 'All products' : filter === 'fresh' ? 'Fresh picks' : filter === 'household' ? 'Household & Personal Care' : (known?.label ?? 'Category');
+  const title = browse
+    ? 'Categories'
+    : filter === 'all'
+      ? 'All products'
+      : filter === 'fresh'
+        ? 'Fresh picks'
+        : filter === 'household'
+          ? 'Household & Personal Care'
+          : filter === 'packaging'
+            ? 'Packaging'
+            : filter === 'butter'
+              ? 'Butter & Cheese'
+              : filter === 'sauces'
+                ? 'Sauces'
+                : filter === 'canned'
+                  ? 'Canned & Imported'
+                  : filter === 'frozen'
+                    ? 'Frozen Food'
+                    : (known?.label ?? 'Category');
   const banner = browse ? null : bannerFor(filter);
   return (
     <View style={styles.screen}>
@@ -736,6 +1163,7 @@ function CategoryScreen({
           </>
         )}
       </ScrollView>
+      <TabBar tab={tab} onTab={onTab} />
     </View>
   );
 }
@@ -948,9 +1376,10 @@ function InfoScreen({
 }
 
 function TabBar({ tab, onTab }: { tab: ShopTab; onTab: (tab: ShopTab) => void }) {
-  const items: Array<{ id: ShopTab; label: string; icon: 'home' | 'lists' | 'orders' | 'account' }> = [
+  const items: Array<{ id: ShopTab; label: string; icon: 'home' | 'explore' | 'lists' | 'orders' | 'account' }> = [
     { id: 'home', label: 'Shop', icon: 'home' },
-    { id: 'lists', label: 'My list', icon: 'lists' },
+    { id: 'explore', label: 'Explore', icon: 'explore' },
+    { id: 'lists', label: 'My List', icon: 'lists' },
     { id: 'orders', label: 'Orders', icon: 'orders' },
     { id: 'account', label: 'Account', icon: 'account' },
   ];
@@ -958,7 +1387,7 @@ function TabBar({ tab, onTab }: { tab: ShopTab; onTab: (tab: ShopTab) => void })
     <View style={[styles.tabs, { paddingBottom: Platform.OS === 'web' ? 10 : 22 }]}>
       {items.map((item) => (
         <TouchableOpacity key={item.id} style={styles.tab} onPress={() => onTab(item.id)} accessibilityRole="button" accessibilityLabel={item.label} accessibilityState={{ selected: tab === item.id }}>
-          <Icon svg={tabSvg(item.icon, tab === item.id)} size={22} />
+          <Icon svg={tabSvg(item.icon, tab === item.id)} size={26} />
           <Text style={[styles.tabLabel, tab === item.id && styles.tabOn]}>{item.label}</Text>
         </TouchableOpacity>
       ))}
@@ -968,19 +1397,17 @@ function TabBar({ tab, onTab }: { tab: ShopTab; onTab: (tab: ShopTab) => void })
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#FFFFFF' },
-  homeScroll: { paddingBottom: 20 },
+  homeScroll: { paddingBottom: 16 },
   homeScrollView: { flex: 1 },
   homeTop: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 18,
-    paddingTop: 14,
-    paddingBottom: 10,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 12,
     backgroundColor: '#FFFFFF',
     zIndex: 2,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: LINE,
   },
   deliver: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   deliverLabel: { fontSize: 11, color: MUTED },
@@ -1003,9 +1430,16 @@ const styles = StyleSheet.create({
   catImage: { width: 78, height: 78 },
   catImageFill: { width: '100%', height: '100%' },
   catLabel: { marginTop: 8, fontSize: 12, fontWeight: '600', color: INK, textAlign: 'center', paddingHorizontal: 4 },
-  tabs: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: LINE, paddingTop: 10, paddingBottom: 12, backgroundColor: '#FFFFFF' },
+  tabs: {
+    flexDirection: 'row',
+    borderTopWidth: 1,
+    borderTopColor: '#E6E8EC',
+    paddingTop: 8,
+    paddingBottom: 10,
+    backgroundColor: '#FFFFFF',
+  },
   tab: { flex: 1, alignItems: 'center', gap: 4 },
-  tabLabel: { fontSize: 12, fontWeight: '600', color: MUTED },
+  tabLabel: { fontSize: 12, fontWeight: '600', color: '#9CA3AF' },
   tabOn: { color: ORANGE, fontWeight: '700' },
   nav: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 },
   back: { fontSize: 32, lineHeight: 32, color: INK, width: 28 },
@@ -1066,15 +1500,17 @@ const styles = StyleSheet.create({
   address: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8, paddingHorizontal: 16 },
   addressCopy: { flex: 1 },
   search: {
-    marginTop: 8,
+    marginTop: 14,
     marginHorizontal: 16,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: FIELD,
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E4E6EB',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    gap: 8,
+    paddingHorizontal: 14,
+    gap: 10,
   },
   searchInput: {
     flex: 1,
@@ -1085,18 +1521,64 @@ const styles = StyleSheet.create({
   },
   clearMark: { fontSize: 22, color: MUTED, lineHeight: 22 },
   mode: {
-    marginTop: 12,
+    marginTop: 6,
     marginHorizontal: 16,
-    height: 38,
-    borderRadius: 21,
+    height: 54,
+    borderRadius: 27,
     backgroundColor: FIELD,
     flexDirection: 'row',
-    padding: 3,
+    alignItems: 'center',
+    padding: 4,
+    position: 'relative',
   },
-  modeBtn: { flex: 1, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
-  modeOn: { backgroundColor: '#1B2430' },
+  modePill: {
+    position: 'absolute',
+    left: 4,
+    top: 4,
+    bottom: 4,
+    borderRadius: 20,
+    backgroundColor: INK,
+  },
+  modeBtn: { flex: 1, zIndex: 1, height: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
   modeText: { fontSize: 14, fontWeight: '700', color: INK },
   modeTextOn: { color: '#FFFFFF' },
+  deliveryTitle: { fontSize: 20, fontWeight: '800', color: INK },
+  cartBtn: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroWrap: { marginHorizontal: 16, marginTop: 16 },
+  promoClip: { borderRadius: 18, overflow: 'hidden', backgroundColor: '#1F8F45', position: 'relative' },
+  promoSlide: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    ...(Platform.OS === 'web' ? ({ transition: 'opacity 700ms ease-in-out' } as object) : {}),
+  },
+  promoImage: { width: '100%', height: 196 },
+  shopNow: {
+    position: 'absolute',
+    left: 14,
+    bottom: 14,
+    zIndex: 3,
+    backgroundColor: '#141517',
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  shopNowText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
+  catHead: { fontSize: 22, fontWeight: '800', color: INK, paddingHorizontal: 16, marginTop: 18, marginBottom: 12 },
+  catGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 16, gap: 10 },
+  catTile: { borderWidth: 1, borderColor: '#E6E8EC', borderRadius: 16, overflow: 'hidden', backgroundColor: '#FFFFFF' },
+  catPhoto: { height: 92, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
+  catPhotoImage: { width: '100%', height: '100%', transform: [{ scale: 1.16 }] },
+  catFoot: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', paddingHorizontal: 8, paddingTop: 8, paddingBottom: 8, gap: 4, minHeight: 46 },
+  catFootLabel: { flex: 1, fontSize: 13, lineHeight: 16, fontWeight: '700', color: INK },
+  catChevron: { color: '#98A2B3', fontSize: 18, lineHeight: 18 },
   heroBanner: {
     marginTop: 8,
     marginHorizontal: 16,
@@ -1177,6 +1659,65 @@ const styles = StyleSheet.create({
   accountLink: { marginHorizontal: 16, marginTop: 18 },
   accountLinkLabel: { color: ORANGE, fontSize: 16, fontWeight: '800' },
   infoBody: { flex: 1, paddingTop: 8 },
+  shopHead: { paddingHorizontal: 0, backgroundColor: '#FFFFFF' },
+  shopBrand: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 10 },
+  shopLogo: { width: 104, height: 20 },
+  shopLoc: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 6 },
+  shopLocCopy: { flexShrink: 1, minWidth: 0 },
+  shopLocLabel: { fontSize: 10, lineHeight: 12, color: MUTED, fontWeight: '500' },
+  shopLocCity: { fontSize: 12, lineHeight: 15, fontWeight: '700', color: INK },
+  listSearch: { marginTop: 10 },
+  shopBody: { flex: 1, flexDirection: 'row', minHeight: 0 },
+  rail: { width: 88, maxWidth: 88, flexGrow: 0, flexShrink: 0, overflow: 'hidden', backgroundColor: '#FAFBFC', borderRightWidth: 1, borderRightColor: '#F0F1F3' },
+  railContent: { paddingVertical: 6, paddingBottom: 16 },
+  railItem: { width: 88, alignItems: 'center', paddingVertical: 10, paddingHorizontal: 6, borderLeftWidth: 4, borderLeftColor: 'transparent' },
+  railItemOn: { borderLeftColor: ORANGE },
+  railIcon: { width: 56, height: 56, borderRadius: 14, borderWidth: 1, borderColor: 'transparent', overflow: 'hidden', backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
+  railIconOn: { borderColor: ORANGE, borderWidth: 1.5 },
+  railPhoto: { width: 48, height: 48 },
+  railLabel: { width: 76, marginTop: 6, fontSize: 11, lineHeight: 13, fontWeight: '600', color: '#667085', textAlign: 'center' },
+  railLabelOn: { color: ORANGE, fontWeight: '800' },
+  shopList: { flex: 1, minWidth: 0 },
+  shopListScroll: { flex: 1 },
+  shopListContent: { paddingHorizontal: 6, paddingBottom: 16 },
+  listHead: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, paddingHorizontal: 10, paddingTop: 8, paddingBottom: 4 },
+  listHeadCopy: { flex: 1, minWidth: 0 },
+  listTitle: { fontSize: 18, fontWeight: '800', color: INK },
+  listCount: { marginTop: 2, fontSize: 12, color: MUTED },
+  sortBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 4, paddingVertical: 6 },
+  sortText: { color: '#667085', fontWeight: '700', fontSize: 13 },
+  sortMenu: { borderWidth: 1, borderColor: '#EFEFF2', borderRadius: 12, marginBottom: 8, backgroundColor: '#FFFFFF', overflow: 'hidden' },
+  sortOption: { paddingHorizontal: 12, paddingVertical: 10 },
+  sortOptionText: { color: INK, fontSize: 13, fontWeight: '600' },
+  sortOptionOn: { color: ORANGE, fontWeight: '800' },
+  productGrid: { flexDirection: 'row', flexWrap: 'wrap' },
+  gridCell: { width: '50%', padding: 6 },
+  productCard: {
+    flex: 1,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    overflow: 'hidden',
+    ...Platform.select({
+      web: { boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)' } as object,
+      default: { shadowColor: '#000000', shadowOpacity: 0.08, shadowRadius: 4, shadowOffset: { width: 0, height: 1 }, elevation: 1 },
+    }),
+  },
+  productPhoto: { width: '100%', height: 96, position: 'relative', backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  productHit: { width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' },
+  productImage: { width: '92%', height: '92%' },
+  offBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: ORANGE, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 3 },
+  offBadgeText: { color: '#FFFFFF', fontSize: 10, fontWeight: '800' },
+  minuteRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 },
+  minuteText: { color: MUTED, fontSize: 11, fontWeight: '700' },
+  priceLine: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4, marginBottom: 8 },
+  productBody: { flex: 1, paddingHorizontal: 10, paddingTop: 8, paddingBottom: 10 },
+  cardHeart: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
+  cardActions: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 'auto' },
+  cardAdd: { flex: 1 },
+  productName: { fontSize: 13, lineHeight: 16, fontWeight: '800', color: INK, minHeight: 32 },
+  productUnit: { marginTop: 2, fontSize: 11, color: MUTED },
+  productPrice: { color: INK, fontWeight: '800', fontSize: 15 },
+  compareAt: { color: '#98A2B3', fontSize: 12, fontWeight: '600', textDecorationLine: 'line-through' },
   bannerList: { paddingTop: 8 },
   promoBanner: { width: '100%', aspectRatio: 724 / 272, marginBottom: 12, borderRadius: 16 },
   menuScrim: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(17, 17, 20, 0.28)', zIndex: 20 },
