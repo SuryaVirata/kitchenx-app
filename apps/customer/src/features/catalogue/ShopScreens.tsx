@@ -108,6 +108,8 @@ const STARTERS = [
   { id: 'fresh', name: 'Fresh picks', image: require('../../../assets/shop/cat-capsicum.png') },
 ] as const;
 
+const FAST_BANNER = require('../../../assets/Fast Delivery Asserts/Delivered Fast 1.png');
+
 const HERO_BANNERS = [
   { id: 'produce', title: 'Fresh Fruits & Vegetables', category: 'vegetables', image: require('../../../assets/banners/Fresh Fruits and Vegetables Banner.png') },
   { id: 'essentials', title: 'Daily Essentials', category: 'rice', image: require('../../../assets/banners/Daily Essentials Grocery Banner.png') },
@@ -173,7 +175,7 @@ function tabSvg(name: 'home' | 'explore' | 'orders' | 'lists' | 'account', activ
     return `<svg ${common}><path d="M3.6 8.2 12 4.4l8.4 3.8L12 12 3.6 8.2Z"/><path d="M3.6 8.2V16l8.4 3.8L20.4 16V8.2"/><path d="M12 12v7.8"/></svg>`;
   }
   if (name === 'lists') {
-    return `<svg ${common}><rect x="6" y="3.4" width="12" height="17.2" rx="2"/><path d="M9.2 3.4h5.6v2.3H9.2z"/><path d="M9 10h6M9 13.2h6M9 16.4h4"/></svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="4.7" rx="1.55" ry="1.05"/><path d="M12 5.75v1.2"/><path d="M4.7 16.2c.35-4.35 3.45-7.15 7.3-7.15s6.95 2.8 7.3 7.15"/><path d="M3.2 16.2h17.6"/><path d="M4.6 18.7h14.8"/></svg>`;
   }
   return `<svg ${common}><circle cx="12" cy="8" r="3.2" fill="${fill}"/><path d="M5.6 19.6c.8-3.2 3.1-4.8 6.4-4.8s5.6 1.6 6.4 4.8"/></svg>`;
 }
@@ -415,7 +417,7 @@ export function ShopFlow({
             <Text style={styles.menuTitle}>Menu</Text>
             {([
               ['Shop', 'home'],
-              ['My list', 'lists'],
+              ['Starter', 'lists'],
               ['Orders', 'orders'],
               ['Account', 'account'],
             ] as const).map(([label, id]) => (
@@ -440,7 +442,7 @@ export function ShopFlow({
   );
 }
 
-function HeroCarousel({ width, onOpen }: { width: number; onOpen: (id: string) => void }) {
+function HeroCarousel({ width, onOpen, mode }: { width: number; onOpen: (id: string) => void; mode: 'standard' | 'express' }) {
   const height = Math.round(width * (768 / 2048));
   const index = useRef(0);
   const paused = useRef(false);
@@ -460,13 +462,29 @@ function HeroCarousel({ width, onOpen }: { width: number; onOpen: (id: string) =
   };
 
   useEffect(() => {
-    if (!splashReady) return undefined;
+    if (!splashReady || mode !== 'standard') return undefined;
     const timer = setInterval(() => {
       if (paused.current) return;
       show((index.current + 1) % HERO_BANNERS.length);
     }, 4500);
     return () => clearInterval(timer);
-  }, [splashReady]);
+  }, [splashReady, mode]);
+
+  if (mode === 'express') {
+    return (
+      <Pressable
+        style={[styles.promoClip, { height, backgroundColor: 'transparent' }]}
+        onPress={() => onOpen('all')}
+        accessibilityRole="button"
+        accessibilityLabel="Shop kitchen essentials delivered fast"
+      >
+        <Image source={FAST_BANNER} style={{ width: '100%', height }} resizeMode="contain" fadeDuration={0} />
+        <View style={[styles.shopNow, { pointerEvents: 'none' }]}>
+          <Text style={styles.shopNowText}>Shop now  ›</Text>
+        </View>
+      </Pressable>
+    );
+  }
 
   return (
     <View>
@@ -683,7 +701,7 @@ function HomeScreen({
         ) : (
           <>
             <View style={styles.heroWrap}>
-              <HeroCarousel width={frame - 32} onOpen={onOpenCategory} />
+              <HeroCarousel width={frame - 32} onOpen={onOpenCategory} mode={mode} />
             </View>
             <Text style={styles.catHead}>Shop by category</Text>
             <View style={styles.catGrid}>
@@ -1312,7 +1330,7 @@ function ListScreen({
   return (
     <View style={styles.screen}>
       <View style={styles.nav}>
-        <Text style={styles.navTitle}>My list</Text>
+        <Text style={styles.navTitle}>Starter</Text>
         <View style={{ width: 28 }} />
       </View>
       <ScrollView contentContainerStyle={{ paddingBottom: 16, flexGrow: 1 }}>
@@ -1379,7 +1397,7 @@ function TabBar({ tab, onTab }: { tab: ShopTab; onTab: (tab: ShopTab) => void })
   const items: Array<{ id: ShopTab; label: string; icon: 'home' | 'explore' | 'lists' | 'orders' | 'account' }> = [
     { id: 'home', label: 'Shop', icon: 'home' },
     { id: 'explore', label: 'Explore', icon: 'explore' },
-    { id: 'lists', label: 'My List', icon: 'lists' },
+    { id: 'lists', label: 'Starter', icon: 'lists' },
     { id: 'orders', label: 'Orders', icon: 'orders' },
     { id: 'account', label: 'Account', icon: 'account' },
   ];
