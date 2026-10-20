@@ -11,6 +11,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import { AccountFlow } from './AccountScreens';
 import { colors } from '../../theme/theme';
 import { Text, TextInput } from '../../ui/Text';
 import { useSplashReady } from '../../shell/SplashReady';
@@ -108,7 +109,7 @@ const STARTERS = [
   { id: 'fresh', name: 'Fresh picks', image: require('../../../assets/shop/cat-capsicum.png') },
 ] as const;
 
-const FAST_BANNER = require('../../../assets/Fast Delivery Asserts/Delivered Fast 1.png');
+const FAST_BANNER = require('../../../assets/Fast Delivery Asserts/Fresh Essentials, Delivered Fast.png');
 
 const HERO_BANNERS = [
   { id: 'produce', title: 'Fresh Fruits & Vegetables', category: 'vegetables', image: require('../../../assets/banners/Fresh Fruits and Vegetables Banner.png') },
@@ -133,6 +134,50 @@ const HOME_CATEGORIES = [
   { id: 'sauces', label: 'Sauces', tint: '#FFF3E0', image: require('../../../assets/Category_PNGs/09_sauces_seasoning.png') },
   { id: 'frozen', label: 'Frozen Food', tint: '#E0F7FA', image: require('../../../assets/Category_PNGs/12_frozen_instant_food.png') },
 ] as const;
+
+const EXPLORE_CATEGORIES = [
+  { id: 'vegetables', label: 'Fruits & Vegetables', image: require('../../../assets/Category_PNGs/03_fruits_vegetables.png') },
+  { id: 'fruits', label: 'Fresh Fruits', image: require('../../../assets/shop/cat-lemon.png') },
+  { id: 'dairy', label: 'Dairy & Eggs', image: require('../../../assets/Category_PNGs/05_fresh_dairy.png') },
+  { id: 'rice', label: 'Atta, Rice & Pulses', image: require('../../../assets/Category_PNGs/18_rice_rice_products.png') },
+  { id: 'oils', label: 'Oils, Masala & Spices', image: require('../../../assets/Category_PNGs/13_edible_oils.png') },
+  { id: 'canned', label: 'Packaged Foods', image: require('../../../assets/Category_PNGs/10_canned_imported_items.png') },
+  { id: 'drinks', label: 'Beverages', image: require('../../../assets/Category_PNGs/14_beverages_mixers.png') },
+  { id: 'chicken', label: 'Meat, Chicken & Seafood', image: require('../../../assets/Category_PNGs/08_chicken_eggs.png') },
+] as const;
+
+const EXPLORE_OFFERS = [
+  { id: 'produce', off: 'Upto 25% OFF', title: 'Fresh Vegetables', image: require('../../../assets/Category_PNGs/03_fruits_vegetables.png'), category: 'vegetables' },
+  { id: 'dairy', off: 'Upto 30% OFF', title: 'Dairy & Milk', image: require('../../../assets/Category_PNGs/05_fresh_dairy.png'), category: 'dairy' },
+] as const;
+
+const EXPLORE_OFFER_CATS = [
+  { id: 'rice', off: 'Upto 30% OFF', label: 'Atta, Rice & Pulses', image: require('../../../assets/Category_PNGs/18_rice_rice_products.png') },
+  { id: 'oils', off: 'Upto 25% OFF', label: 'Oils, Masala & Spices', image: require('../../../assets/Category_PNGs/13_edible_oils.png') },
+  { id: 'canned', off: 'Upto 20% OFF', label: 'Packaged Foods', image: require('../../../assets/Category_PNGs/10_canned_imported_items.png') },
+] as const;
+
+const EXPLORE_BRANDS = [
+  { id: 'amul', name: 'Amul', size: 18, italic: true, count: '20+ products', line: 'Goodness for every kitchen', color: '#E10600', image: require('../../../assets/Category_PNGs/05_fresh_dairy.png'), category: 'dairy' },
+  { id: 'aashirvaad', name: 'Aashirvaad', size: 9, italic: false, count: '15+ products', line: 'Everyday atta', color: '#E87722', image: require('../../../assets/Category_PNGs/16_flours.png'), category: 'rice' },
+  { id: 'fortune', name: 'fortune', size: 15, italic: false, count: '18+ products', line: 'Pure & healthy', color: '#D0121A', image: require('../../../assets/Category_PNGs/13_edible_oils.png'), category: 'oils' },
+  { id: 'tata', name: 'Tata', size: 16, italic: false, count: '22+ products', line: 'Tea & staples', color: '#1F4ED8', image: require('../../../assets/explore/brand-tea.jpg'), category: 'drinks' },
+  { id: 'nestle', name: 'Nestlé', size: 14, italic: false, count: '25+ products', line: 'Everyday essentials', color: '#C8102E', image: require('../../../assets/explore/brand-milk.jpg'), category: 'dairy' },
+  { id: 'sunfeast', name: 'Sunfeast', size: 11, italic: false, count: '18+ products', line: 'Biscuits & snacks', color: '#E87722', image: require('../../../assets/explore/brand-biscuit.jpg'), category: 'canned' },
+  { id: 'britannia', name: 'BRITANNIA', size: 8, italic: false, count: '20+ products', line: 'Trusted taste', color: '#123A8C', image: require('../../../assets/Category_PNGs/11_bakery_chocolates.png'), category: 'canned' },
+  { id: 'cocacola', name: 'Coca-Cola', size: 11, italic: true, count: '12+ products', line: 'Chilled drinks', color: '#E10600', image: require('../../../assets/Category_PNGs/14_beverages_mixers.png'), category: 'drinks' },
+] as const;
+
+const FEATURED_BRANDS = ['fortune', 'nestle', 'britannia'] as const;
+
+const EXPLORE_CUISINES = [
+  { id: 'vegetables', label: 'South Indian', image: require('../../../assets/explore/cuisine-south.jpg') },
+  { id: 'rice', label: 'North Indian', image: require('../../../assets/explore/cuisine-north.jpg') },
+  { id: 'canned', label: 'Chinese', image: require('../../../assets/explore/cuisine-chinese.jpg') },
+  { id: 'oils', label: 'Continental', image: require('../../../assets/explore/cuisine-continental.jpg') },
+] as const;
+
+const RECOMMENDED_IDS = ['tomato', 'potato', 'onion', 'carrot'] as const;
 
 function glyph(body: string, color: string) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
@@ -227,10 +272,10 @@ export function ShopFlow({
   onEditDetails?: () => void;
   onEditOutlet?: () => void;
 }) {
-  const [screen, setScreen] = useState<'home' | 'category' | 'product' | 'cart' | 'list' | 'orders' | 'account' | 'alerts'>('home');
+  const [screen, setScreen] = useState<'home' | 'explore' | 'category' | 'product' | 'cart' | 'list' | 'orders' | 'account' | 'alerts'>('home');
   const [tab, setTab] = useState<ShopTab>('home');
   const [productId, setProductId] = useState('tomato');
-  const [backTo, setBackTo] = useState<'home' | 'category' | 'list'>('home');
+  const [backTo, setBackTo] = useState<'home' | 'category' | 'list' | 'explore'>('home');
   const [filter, setFilter] = useState('vegetables');
   const [browse, setBrowse] = useState(false);
   const [cart, setCart] = useState<Record<string, number>>({});
@@ -239,7 +284,7 @@ export function ShopFlow({
   const [query, setQuery] = useState('');
   const [mode, setMode] = useState<'standard' | 'express'>('standard');
   const [menu, setMenu] = useState(false);
-  const [cartBack, setCartBack] = useState<'home' | 'category'>('home');
+  const [cartBack, setCartBack] = useState<'home' | 'category' | 'explore' | 'account'>('home');
 
   const cartCount = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
   const add = (id: string, qty = 1) => setCart((current) => ({ ...current, [id]: (current[id] ?? 0) + qty }));
@@ -252,7 +297,7 @@ export function ShopFlow({
     });
   const toggleSaved = (id: string) => setSaved((current) => ({ ...current, [id]: !current[id] }));
 
-  const openProduct = (id: string, from: 'home' | 'category' | 'list') => {
+  const openProduct = (id: string, from: 'home' | 'category' | 'list' | 'explore') => {
     setProductId(id);
     setBackTo(from);
     setScreen('product');
@@ -260,7 +305,7 @@ export function ShopFlow({
   const openCategory = (id: string) => {
     setFilter(id);
     setBrowse(false);
-    setTab('home');
+    setTab((current) => (current === 'explore' ? 'explore' : 'home'));
     setScreen('category');
   };
   const openBrowse = () => {
@@ -271,7 +316,10 @@ export function ShopFlow({
     setTab(next);
     setMenu(false);
     if (next === 'home') setScreen('home');
-    if (next === 'explore') openBrowse();
+    if (next === 'explore') {
+      setBrowse(false);
+      setScreen('explore');
+    }
     if (next === 'lists') setScreen('list');
     if (next === 'orders') setScreen('orders');
     if (next === 'account') setScreen('account');
@@ -286,6 +334,10 @@ export function ShopFlow({
         onBrowse={openCategory}
         cartCount={cartCount}
         onBack={() => {
+          if (tab === 'explore') {
+            setScreen('explore');
+            return;
+          }
           setTab('home');
           setScreen('home');
         }}
@@ -358,16 +410,48 @@ export function ShopFlow({
   }
   if (screen === 'account') {
     return (
-      <InfoScreen
-        title="Account"
-        body="Account details are not connected yet."
+      <AccountFlow
+        city={city}
+        cartCount={cartCount}
+        onDeliver={onDeliver}
+        onCart={() => {
+          setCartBack('account');
+          setScreen('cart');
+        }}
+        onHome={() => {
+          setTab('home');
+          setScreen('home');
+        }}
+        onRegister={onSetup}
+        footer={<TabBar tab={tab} onTab={goTab} />}
+      />
+    );
+  }
+  if (screen === 'explore') {
+    return (
+      <ExploreScreen
+        city={city}
+        cart={cart}
+        cartCount={cartCount}
+        onDeliver={onDeliver}
+        onCart={() => {
+          setCartBack('explore');
+          setScreen('cart');
+        }}
+        onHome={() => {
+          setTab('home');
+          setScreen('home');
+        }}
+        onOpenCategory={openCategory}
+        onSeeAll={() => {
+          setBrowse(true);
+          setScreen('category');
+        }}
+        onOpenProduct={(id) => openProduct(id, 'explore')}
+        onAdd={(id) => add(id, 1)}
+        onSetQty={setQty}
         tab={tab}
         onTab={goTab}
-        links={[
-          onSetup ? { label: 'Restaurant setup', onPress: onSetup } : null,
-          onEditDetails ? { label: 'Edit details', onPress: onEditDetails } : null,
-          onEditOutlet ? { label: 'Edit outlet details', onPress: onEditOutlet } : null,
-        ].filter((item): item is { label: string; onPress: () => void } => Boolean(item))}
       />
     );
   }
@@ -636,8 +720,6 @@ function HomeScreen({
 }) {
   const { width } = useWindowDimensions();
   const frame = width > 600 ? 480 : width;
-  const cols = 3;
-  const card = Math.floor((frame - 32 - 20) / cols);
   const q = query.trim().toLowerCase();
   const results = q
     ? PRODUCTS.filter((item) => item.name.toLowerCase().includes(q) || item.category.includes(q) || item.unit.toLowerCase().includes(q))
@@ -706,15 +788,17 @@ function HomeScreen({
             <Text style={styles.catHead}>Shop by category</Text>
             <View style={styles.catGrid}>
               {HOME_CATEGORIES.map((item) => (
-                <Pressable key={item.id} style={[styles.catTile, { width: card }]} onPress={() => onOpenCategory(item.id)} accessibilityRole="button" accessibilityLabel={item.label}>
-                  <View style={[styles.catPhoto, { backgroundColor: item.tint }]}>
-                    <Image source={item.image} style={styles.catPhotoImage} resizeMode="contain" />
-                  </View>
-                  <View style={styles.catFoot}>
-                    <Text style={styles.catFootLabel} numberOfLines={2}>{item.label}</Text>
-                    <Text style={styles.catChevron}>›</Text>
-                  </View>
-                </Pressable>
+                <View key={item.id} style={styles.catCell}>
+                  <Pressable style={styles.catTile} onPress={() => onOpenCategory(item.id)} accessibilityRole="button" accessibilityLabel={item.label}>
+                    <View style={[styles.catPhoto, { backgroundColor: item.tint }]}>
+                      <Image source={item.image} style={styles.catPhotoImage} resizeMode="contain" />
+                    </View>
+                    <View style={styles.catFoot}>
+                      <Text style={styles.catFootLabel} numberOfLines={2}>{item.label}</Text>
+                      <Text style={styles.catChevron}>›</Text>
+                    </View>
+                  </Pressable>
+                </View>
               ))}
             </View>
           </>
@@ -725,13 +809,273 @@ function HomeScreen({
   );
 }
 
-function SectionHead({ title, onSeeAll }: { title: string; onSeeAll: () => void }) {
+function SectionHead({ title, onSeeAll }: { title: string; onSeeAll?: () => void }) {
   return (
     <View style={styles.sectionRow}>
       <Text style={styles.sectionTitle}>{title}</Text>
-      <TouchableOpacity onPress={onSeeAll} accessibilityRole="button" accessibilityLabel={`See all ${title}`}>
-        <Text style={styles.seeAll}>See all →</Text>
-      </TouchableOpacity>
+      {onSeeAll ? (
+        <TouchableOpacity onPress={onSeeAll} accessibilityRole="button" accessibilityLabel={`See all ${title}`}>
+          <Text style={styles.seeAll}>See all</Text>
+        </TouchableOpacity>
+      ) : null}
+    </View>
+  );
+}
+
+function discountOf(price: number, compareAt?: number) {
+  if (!compareAt || compareAt <= price) return null;
+  return Math.round((1 - price / compareAt) * 100);
+}
+
+function ExploreScreen({
+  city,
+  cart,
+  cartCount,
+  onDeliver,
+  onCart,
+  onHome,
+  onOpenCategory,
+  onSeeAll,
+  onOpenProduct,
+  onAdd,
+  onSetQty,
+  tab,
+  onTab,
+}: {
+  city: string;
+  cart: Record<string, number>;
+  cartCount: number;
+  onDeliver?: () => void;
+  onCart: () => void;
+  onHome: () => void;
+  onOpenCategory: (id: string) => void;
+  onSeeAll: () => void;
+  onOpenProduct: (id: string) => void;
+  onAdd: (id: string) => void;
+  onSetQty: (id: string, qty: number) => void;
+  tab: ShopTab;
+  onTab: (tab: ShopTab) => void;
+}) {
+  const { width } = useWindowDimensions();
+  const [query, setQuery] = useState('');
+  const q = query.trim().toLowerCase();
+  const results = q
+    ? PRODUCTS.filter((item) => item.name.toLowerCase().includes(q) || item.category.includes(q) || item.unit.toLowerCase().includes(q))
+    : [];
+  const featured = EXPLORE_BRANDS[0];
+  const recommended = RECOMMENDED_IDS.map((id) => PRODUCTS.find((item) => item.id === id)).filter((item): item is Product => Boolean(item));
+  return (
+    <View style={[styles.screen, Platform.OS === 'web' ? { height: '100%', overflow: 'hidden' } : null, width > 600 ? { width: 480, alignSelf: 'center' } : null]}>
+      <View style={[styles.shopHead, { paddingTop: Platform.OS === 'web' ? 12 : 46 }]}>
+        <View style={styles.shopBrand}>
+          <TouchableOpacity onPress={onHome} accessibilityRole="button" accessibilityLabel="KitchenX home">
+            <Image source={require('../../../assets/kitchenx-logo-trimmed.png')} style={styles.shopLogo} resizeMode="contain" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onDeliver} accessibilityRole="button" accessibilityLabel={`Deliver to ${city}`} style={styles.shopLoc}>
+            <Icon svg={PIN} size={16} />
+            <View style={styles.shopLocCopy}>
+              <Text style={styles.shopLocLabel}>Deliver to</Text>
+              <Text style={styles.shopLocCity} numberOfLines={1}>{city} ▾</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onCart} accessibilityRole="button" accessibilityLabel="Cart" style={styles.cartBtn}>
+            <Icon svg={CART_LINE} size={24} />
+            {cartCount > 0 ? (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{cartCount > 99 ? '99' : cartCount}</Text>
+              </View>
+            ) : null}
+          </TouchableOpacity>
+        </View>
+        <View style={[styles.search, styles.listSearch]}>
+          <Icon svg={SEARCH} size={20} />
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Search products, brands, categories..."
+            placeholderTextColor="#9AA0A6"
+            style={styles.searchInput}
+            testID="explore-search"
+            returnKeyType="search"
+            autoCorrect={false}
+            autoCapitalize="none"
+          />
+          <Pressable
+            onPress={() => {
+              if (Platform.OS === 'web' && typeof document !== 'undefined') {
+                const node = document.querySelector('[data-testid="explore-search"]') as { focus?: () => void } | null;
+                node?.focus?.();
+              }
+            }}
+            accessibilityRole="button"
+            accessibilityLabel="Scan or search by image"
+          >
+            <Icon svg={SCAN} size={22} />
+          </Pressable>
+        </View>
+      </View>
+      <ScrollView style={styles.homeScrollView} contentContainerStyle={styles.homeScroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        {q ? (
+          <View style={styles.results}>
+            <Text style={styles.sectionTitle}>{results.length ? 'Results' : 'No matching products'}</Text>
+            {results.map((item) => (
+              <Pressable key={item.id} style={styles.row} onPress={() => onOpenProduct(item.id)}>
+                <Image source={item.image} style={styles.rowImage} resizeMode="contain" />
+                <View style={styles.rowBody}>
+                  <Text style={styles.rowName}>{item.name}</Text>
+                  <Text style={styles.rowUnit}>{item.unit}</Text>
+                  <Text style={styles.rowPrice}>₹{item.price}</Text>
+                </View>
+              </Pressable>
+            ))}
+            {!results.length ? <Text style={styles.emptyCopy}>Nothing in the catalogue matches “{query.trim()}”.</Text> : null}
+          </View>
+        ) : (
+          <>
+            <Text style={styles.exploreTitle}>Explore</Text>
+            <Text style={styles.exploreSub}>Discover top categories, offers and more</Text>
+            <Pressable
+              style={styles.exploreHeroCard}
+              onPress={() => onOpenCategory('rice')}
+              accessibilityRole="button"
+              accessibilityLabel="Up to 40% off daily essentials"
+            >
+              <View style={styles.exploreHeroCopy}>
+                <Text style={styles.exploreHeroOff}>Upto 40% OFF</Text>
+                <Text style={styles.exploreHeroName}>Daily Essentials</Text>
+                <Text style={styles.exploreHeroLine}>Fresh produce, dairy, staples & more</Text>
+                <View style={styles.exploreHeroBtn}>
+                  <Text style={styles.shopNowText}>Shop now  ›</Text>
+                </View>
+              </View>
+              <View style={styles.exploreHeroArt}>
+                <Image source={require('../../../assets/Category_PNGs/13_edible_oils.png')} style={styles.exploreHeroOil} resizeMode="contain" />
+                <Image source={require('../../../assets/Category_PNGs/05_fresh_dairy.png')} style={styles.exploreHeroDairy} resizeMode="contain" />
+                <Image source={require('../../../assets/Category_PNGs/03_fruits_vegetables.png')} style={styles.exploreHeroVeg} resizeMode="contain" />
+              </View>
+            </Pressable>
+            <View style={styles.dots}>
+              <View style={[styles.dot, styles.dotOn]} />
+              <View style={styles.dot} />
+              <View style={styles.dot} />
+            </View>
+            <SectionHead title="Shop by category" onSeeAll={onSeeAll} />
+            <View style={styles.exploreCatGrid}>
+              {EXPLORE_CATEGORIES.map((item) => (
+                <Pressable key={item.id} style={styles.exploreCatCell} onPress={() => onOpenCategory(item.id)} accessibilityRole="button" accessibilityLabel={item.label}>
+                  <View style={styles.exploreCatPhoto}>
+                    <Image source={item.image} style={styles.exploreCatImage} resizeMode="cover" />
+                  </View>
+                  <Text style={styles.exploreCatLabel} numberOfLines={2}>{item.label}</Text>
+                </Pressable>
+              ))}
+            </View>
+            <SectionHead title="Top Offers" />
+            <View style={styles.exploreSplit}>
+              {EXPLORE_OFFERS.map((item, index) => (
+                <View key={item.id} style={styles.exploreSplitCard}>
+                  <Pressable style={styles.exploreSplitFace} onPress={() => onOpenCategory(item.category)} accessibilityRole="button" accessibilityLabel={`${item.off} ${item.title}`}>
+                    <Image source={item.image} style={styles.exploreSplitImage} resizeMode="cover" />
+                    <View style={styles.exploreShade}>
+                      <Text style={styles.exploreShadeOff}>{item.off}</Text>
+                      <Text style={styles.exploreShadeTitle} numberOfLines={2}>{item.title}</Text>
+                    </View>
+                    <View style={styles.exploreIndex}><Text style={styles.exploreIndexText}>{index + 1}</Text></View>
+                  </Pressable>
+                </View>
+              ))}
+            </View>
+            <SectionHead title="Offers by category" onSeeAll={onSeeAll} />
+            <View style={styles.exploreOfferRow}>
+              {EXPLORE_OFFER_CATS.map((item) => (
+                <View key={item.id} style={styles.exploreOfferCell}>
+                  <Pressable style={styles.exploreOfferFace} onPress={() => onOpenCategory(item.id)} accessibilityRole="button" accessibilityLabel={`${item.off} ${item.label}`}>
+                    <Image source={item.image} style={styles.exploreOfferImage} resizeMode="cover" />
+                    <View style={styles.exploreShade}>
+                      <Text style={styles.exploreShadeOff}>{item.off}</Text>
+                      <Text style={styles.exploreShadeTitle} numberOfLines={2}>{item.label}</Text>
+                    </View>
+                  </Pressable>
+                </View>
+              ))}
+            </View>
+            <SectionHead title="Shop by brands" onSeeAll={() => onOpenCategory('dairy')} />
+            <View style={styles.exploreCatGrid}>
+              {EXPLORE_BRANDS.map((item) => (
+                <Pressable key={item.id} style={styles.exploreBrandCell} onPress={() => onOpenCategory(item.category)} accessibilityRole="button" accessibilityLabel={item.name}>
+                  <View style={styles.exploreBrandMark}>
+                    <Text style={[styles.exploreBrandWord, { color: item.color, fontSize: item.size, fontStyle: item.italic ? 'italic' : 'normal' }]} numberOfLines={1} adjustsFontSizeToFit>{item.name}</Text>
+                  </View>
+                  <Text style={styles.exploreBrandCount} numberOfLines={1}>{item.count}</Text>
+                </Pressable>
+              ))}
+            </View>
+            <SectionHead title="Featured brands" />
+            <Pressable style={styles.exploreFeatured} onPress={() => onOpenCategory(featured.category)} accessibilityRole="button" accessibilityLabel={featured.name}>
+              <View style={styles.exploreFeaturedCopy}>
+                <Text style={styles.exploreFeaturedName}>{featured.name}</Text>
+                <Text style={styles.exploreFeaturedLine}>{featured.line}</Text>
+              </View>
+              <Image source={featured.image} style={styles.exploreFeaturedPhoto} resizeMode="contain" />
+            </Pressable>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.exploreHScroll}>
+              {FEATURED_BRANDS.map((id) => EXPLORE_BRANDS.find((item) => item.id === id)).filter((item): item is (typeof EXPLORE_BRANDS)[number] => Boolean(item)).map((item) => (
+                <Pressable key={item.id} style={styles.exploreBrandCard} onPress={() => onOpenCategory(item.category)} accessibilityRole="button" accessibilityLabel={item.name}>
+                  <Image source={item.image} style={styles.exploreBrandCardPhoto} resizeMode="contain" />
+                  <Text style={[styles.exploreBrandWord, styles.exploreBrandCardWord, { color: item.color }]} numberOfLines={1}>{item.name}</Text>
+                  <Text style={styles.exploreBrandCount} numberOfLines={1}>{item.line}</Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+            <SectionHead title="Shop by cuisine" onSeeAll={() => onOpenCategory('vegetables')} />
+            <View style={styles.exploreOfferRow}>
+              {EXPLORE_CUISINES.map((item) => (
+                <Pressable key={item.label} style={styles.exploreCuisineCell} onPress={() => onOpenCategory(item.id)} accessibilityRole="button" accessibilityLabel={item.label}>
+                  <Image source={item.image} style={styles.exploreCuisineImage} resizeMode="cover" />
+                  <Text style={styles.exploreCatLabel} numberOfLines={2}>{item.label}</Text>
+                </Pressable>
+              ))}
+            </View>
+            <SectionHead title="Recommended for you" />
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.exploreHScroll}>
+              {recommended.map((item) => {
+                const off = discountOf(item.price, item.compareAt);
+                return (
+                  <View key={item.id} style={styles.exploreProduct}>
+                    <Pressable onPress={() => onOpenProduct(item.id)} accessibilityRole="button" accessibilityLabel={item.name}>
+                      <View style={styles.exploreProductPhoto}>
+                        {off ? (
+                          <View style={styles.offBadge}>
+                            <Text style={styles.offBadgeText}>{off}% OFF</Text>
+                          </View>
+                        ) : null}
+                        <Image source={item.image} style={styles.productImage} resizeMode="contain" />
+                      </View>
+                      <View style={styles.productBody}>
+                        <Text style={styles.productName} numberOfLines={2}>{item.name}</Text>
+                        <Text style={styles.productUnit}>{item.unit}</Text>
+                        <View style={styles.priceLine}>
+                          <Text style={styles.productPrice}>₹{item.price}</Text>
+                          {item.compareAt ? <Text style={styles.compareAt}>₹{item.compareAt}</Text> : null}
+                        </View>
+                      </View>
+                    </Pressable>
+                    <View style={styles.exploreProductAdd}>
+                      <AddControl
+                        qty={cart[item.id] ?? 0}
+                        onInc={() => ((cart[item.id] ?? 0) > 0 ? onSetQty(item.id, (cart[item.id] ?? 0) + 1) : onAdd(item.id))}
+                        onDec={() => onSetQty(item.id, (cart[item.id] ?? 0) - 1)}
+                        label={item.name}
+                      />
+                    </View>
+                  </View>
+                );
+              })}
+            </ScrollView>
+          </>
+        )}
+      </ScrollView>
+      <TabBar tab={tab} onTab={onTab} />
     </View>
   );
 }
@@ -1590,8 +1934,9 @@ const styles = StyleSheet.create({
   },
   shopNowText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
   catHead: { fontSize: 22, fontWeight: '800', color: INK, paddingHorizontal: 16, marginTop: 18, marginBottom: 12 },
-  catGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 16, gap: 10 },
-  catTile: { borderWidth: 1, borderColor: '#E6E8EC', borderRadius: 16, overflow: 'hidden', backgroundColor: '#FFFFFF' },
+  catGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 11 },
+  catCell: { width: '33.33%', maxWidth: '33.33%', paddingHorizontal: 5, paddingBottom: 10 },
+  catTile: { width: '100%', borderWidth: 1, borderColor: '#E6E8EC', borderRadius: 16, overflow: 'hidden', backgroundColor: '#FFFFFF' },
   catPhoto: { height: 92, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
   catPhotoImage: { width: '100%', height: '100%', transform: [{ scale: 1.16 }] },
   catFoot: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', paddingHorizontal: 8, paddingTop: 8, paddingBottom: 8, gap: 4, minHeight: 46 },
@@ -1736,6 +2081,54 @@ const styles = StyleSheet.create({
   productUnit: { marginTop: 2, fontSize: 11, color: MUTED },
   productPrice: { color: INK, fontWeight: '800', fontSize: 15 },
   compareAt: { color: '#98A2B3', fontSize: 12, fontWeight: '600', textDecorationLine: 'line-through' },
+  exploreTitle: { fontSize: 22, fontWeight: '800', color: INK, paddingHorizontal: 16, marginTop: 14 },
+  exploreSub: { fontSize: 13, color: MUTED, paddingHorizontal: 16, marginTop: 2, marginBottom: 12 },
+  exploreHeroCard: { marginHorizontal: 16, borderRadius: 18, backgroundColor: '#FFF1E4', flexDirection: 'row', alignItems: 'center', overflow: 'hidden', minHeight: 156 },
+  exploreHeroCopy: { flex: 1, paddingLeft: 16, paddingVertical: 14, paddingRight: 4, zIndex: 1 },
+  exploreHeroOff: { color: ORANGE, fontSize: 20, lineHeight: 24, fontWeight: '800' },
+  exploreHeroName: { marginTop: 2, color: INK, fontSize: 17, lineHeight: 21, fontWeight: '800' },
+  exploreHeroLine: { marginTop: 4, color: MUTED, fontSize: 11, lineHeight: 14, fontWeight: '600' },
+  exploreHeroBtn: { alignSelf: 'flex-start', marginTop: 10, backgroundColor: '#141517', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 7 },
+  exploreHeroArt: { width: 156, height: 156, position: 'relative' },
+  exploreHeroOil: { position: 'absolute', right: -8, top: 6, width: 72, height: 120 },
+  exploreHeroDairy: { position: 'absolute', right: 28, bottom: 4, width: 86, height: 96 },
+  exploreHeroVeg: { position: 'absolute', left: -4, bottom: 0, width: 108, height: 108 },
+  exploreCatGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 8 },
+  exploreCatCell: { width: '25%', maxWidth: '25%', paddingHorizontal: 4, paddingBottom: 12, alignItems: 'center' },
+  exploreCatPhoto: { width: 72, height: 72, borderRadius: 18, backgroundColor: '#F4F5F7', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  exploreCatImage: { width: 72, height: 72 },
+  exploreCatLabel: { marginTop: 6, fontSize: 11, lineHeight: 14, fontWeight: '700', color: INK, textAlign: 'center' },
+  exploreSplit: { flexDirection: 'row', paddingHorizontal: 11 },
+  exploreSplitCard: { width: '50%', paddingHorizontal: 5 },
+  exploreSplitFace: { height: 148, borderRadius: 16, overflow: 'hidden', position: 'relative', backgroundColor: '#F7F4F0' },
+  exploreSplitImage: { width: '100%', height: '100%' },
+  exploreOfferRow: { flexDirection: 'row', paddingHorizontal: 11 },
+  exploreOfferCell: { width: '33.33%', maxWidth: '33.33%', paddingHorizontal: 5, marginBottom: 8 },
+  exploreOfferFace: { height: 118, borderRadius: 14, overflow: 'hidden', position: 'relative', backgroundColor: '#F7F4F0' },
+  exploreOfferImage: { width: '100%', height: '100%' },
+  exploreShade: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 8, paddingVertical: 8, backgroundColor: 'rgba(20, 21, 23, 0.45)', borderBottomLeftRadius: 14, borderBottomRightRadius: 14 },
+  exploreShadeOff: { color: '#FFFFFF', fontSize: 11, lineHeight: 14, fontWeight: '800' },
+  exploreShadeTitle: { color: '#FFFFFF', fontSize: 11, lineHeight: 14, fontWeight: '700' },
+  exploreIndex: { position: 'absolute', top: 8, right: 8, width: 18, height: 18, borderRadius: 9, backgroundColor: ORANGE, alignItems: 'center', justifyContent: 'center' },
+  exploreIndexText: { color: '#FFFFFF', fontSize: 10, fontWeight: '800' },
+  exploreBrandCell: { width: '25%', maxWidth: '25%', paddingHorizontal: 4, paddingBottom: 12, alignItems: 'center' },
+  exploreBrandMark: { width: '100%', height: 64, borderRadius: 12, borderWidth: 1, borderColor: '#E6E8EC', backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
+  exploreBrandWord: { fontSize: 10, lineHeight: 13, fontWeight: '800', textAlign: 'center' },
+  exploreBrandCount: { marginTop: 4, fontSize: 10, lineHeight: 13, color: MUTED, textAlign: 'center' },
+  exploreFeatured: { marginHorizontal: 16, marginBottom: 12, borderRadius: 16, backgroundColor: '#9B1B30', flexDirection: 'row', alignItems: 'center', overflow: 'hidden', minHeight: 96 },
+  exploreFeaturedCopy: { flex: 1, paddingVertical: 16, paddingLeft: 16, paddingRight: 8 },
+  exploreFeaturedName: { color: '#FFFFFF', fontSize: 26, fontWeight: '800' },
+  exploreFeaturedLine: { marginTop: 4, color: '#FFFFFF', fontSize: 13, fontWeight: '600' },
+  exploreFeaturedPhoto: { width: 132, height: 96 },
+  exploreHScroll: { paddingHorizontal: 16, paddingBottom: 8 },
+  exploreBrandCard: { width: 148, marginRight: 10, borderWidth: 1, borderColor: '#E6E8EC', borderRadius: 14, overflow: 'hidden', backgroundColor: '#FFFFFF', paddingBottom: 8 },
+  exploreBrandCardPhoto: { width: '100%', height: 84, backgroundColor: '#F7F4F0' },
+  exploreBrandCardWord: { marginTop: 8, paddingHorizontal: 8 },
+  exploreCuisineCell: { width: '25%', maxWidth: '25%', paddingHorizontal: 5, alignItems: 'center' },
+  exploreCuisineImage: { width: '100%', height: 78, borderRadius: 16 },
+  exploreProduct: { width: 148, marginRight: 10, borderRadius: 12, backgroundColor: '#FFFFFF', overflow: 'hidden', borderWidth: 1, borderColor: '#E6E8EC' },
+  exploreProductAdd: { paddingHorizontal: 10, paddingBottom: 10 },
+  exploreProductPhoto: { width: '100%', height: 96, backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center', position: 'relative' },
   bannerList: { paddingTop: 8 },
   promoBanner: { width: '100%', aspectRatio: 724 / 272, marginBottom: 12, borderRadius: 16 },
   menuScrim: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(17, 17, 20, 0.28)', zIndex: 20 },
