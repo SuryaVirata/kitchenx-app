@@ -3,7 +3,7 @@ import { Animated, StyleSheet, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/inter';
 import { StatusBar } from 'expo-status-bar';
-import { fontRole } from '../theme/theme';
+import { colors, fontRole } from '../theme/theme';
 import { SplashScreen } from '../shell/SplashScreen';
 import { CustomerSessionProvider } from '../shell/CustomerSession';
 import { AppRouterProvider, useAppRouter } from '../shell/AppRouter';
@@ -82,12 +82,12 @@ function RootShell() {
           <SplashScreen />
         </Animated.View>
       ) : null}
-      <StatusBar style={splashOverlayVisible || href === '/login' ? 'light' : 'dark'} />
+      <StatusBar style={splashOverlayVisible ? 'dark' : href === '/login' ? 'light' : 'dark'} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#FFFFFF' },
-  splashOverlay: { backgroundColor: '#FFFFFF' },
+  splashOverlay: { backgroundColor: colors.white },
 });
