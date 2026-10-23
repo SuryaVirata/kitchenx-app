@@ -14,6 +14,13 @@ export const colors = {
   white: '#FFFFFF',
 } as const;
 
+/** Splash field only. Lighter under the top cap, deeper just above the bottom cap. */
+export const splashGradient = {
+  top: '#EE4A16',
+  mid: '#D54314',
+  bottom: '#CA4013',
+} as const;
+
 export const fontRole = {
   heading: 'BrandHeading',
   body: 'BrandBody',

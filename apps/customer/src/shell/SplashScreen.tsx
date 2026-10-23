@@ -1,13 +1,27 @@
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, Image, Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { colors } from '../theme/theme';
+import { colors, splashGradient } from '../theme/theme';
 import { Text } from '../ui/Text';
 
 /**
- * Brand orange between matching white caps at the top and bottom.
+ * Orange gradient between a taller white cap and a shorter one.
  * The wordmark is the existing logo, shown white. The tagline is two lines.
  * The logo eases up into place. The fade out of this screen lives in the root layout.
  */
+
+const SPLASH_FILL = `linear-gradient(180deg, ${splashGradient.top} 0%, ${splashGradient.mid} 22%, ${splashGradient.mid} 78%, ${splashGradient.bottom} 100%)`;
+
+function mix(from: string, to: string, t: number) {
+  const channel = (hex: string, index: number) => parseInt(hex.slice(1 + index * 2, 3 + index * 2), 16);
+  const parts = [0, 1, 2].map((index) => Math.round(channel(from, index) + (channel(to, index) - channel(from, index)) * t));
+  return `rgb(${parts[0]}, ${parts[1]}, ${parts[2]})`;
+}
+
+function splashColor(t: number) {
+  if (t <= 0.22) return mix(splashGradient.top, splashGradient.mid, t / 0.22);
+  if (t >= 0.78) return mix(splashGradient.mid, splashGradient.bottom, (t - 0.78) / 0.22);
+  return splashGradient.mid;
+}
 
 const LOGO_ASPECT_RATIO = 3171 / 369;
 const LOGO_WIDTH_RATIO = 0.72;
@@ -23,9 +37,8 @@ function OrangeField({ top, bottom }: { top: number; bottom: number }) {
         style={[
           frame,
           {
-            backgroundColor: colors.orange,
-            backgroundImage:
-              'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.06) 42%, rgba(255,255,255,0) 100%)',
+            backgroundColor: splashGradient.mid,
+            backgroundImage: SPLASH_FILL,
           } as object,
         ]}
       />
@@ -34,11 +47,10 @@ function OrangeField({ top, bottom }: { top: number; bottom: number }) {
 
   const steps = 16;
   return (
-    <View style={[frame, { backgroundColor: colors.orange }]}>
+    <View style={[frame, { backgroundColor: splashGradient.mid }]}>
       {Array.from({ length: steps }, (_, index) => {
         const t = index / (steps - 1);
-        const opacity = (1 - t) * 0.2;
-        return <View key={index} style={{ flex: 1, backgroundColor: `rgba(255,255,255,${opacity.toFixed(3)})` }} />;
+        return <View key={index} style={{ flex: 1, backgroundColor: splashColor(t) }} />;
       })}
     </View>
   );
@@ -46,7 +58,8 @@ function OrangeField({ top, bottom }: { top: number; bottom: number }) {
 
 export function SplashScreen() {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
-  const cap = Math.max(36, Math.round(screenHeight * 0.045));
+  const topCap = Math.max(48, Math.round(screenHeight * 0.062));
+  const bottomCap = Math.max(20, Math.round(screenHeight * 0.026));
   const frameWidth = screenWidth > 600 ? Math.min(screenWidth, 480) : screenWidth;
   const logoWidth = frameWidth * LOGO_WIDTH_RATIO;
   const logoHeight = logoWidth / LOGO_ASPECT_RATIO;
@@ -67,8 +80,8 @@ export function SplashScreen() {
 
   return (
     <View style={styles.root}>
-      <OrangeField top={cap} bottom={cap} />
-      <View style={[styles.content, { top: cap, bottom: cap }]}>
+      <OrangeField top={topCap} bottom={bottomCap} />
+      <View style={[styles.content, { top: topCap, bottom: bottomCap }]}>
         <Animated.View style={[styles.lockup, { transform: [{ translateY: logoOffsetY }] }]}>
           <Image
             source={require('../../assets/kitchenx-logo-trimmed.png')}
