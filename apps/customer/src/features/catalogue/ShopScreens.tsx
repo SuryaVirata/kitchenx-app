@@ -12,6 +12,7 @@ import {
   View,
 } from 'react-native';
 import { AccountFlow } from './AccountScreens';
+import { OrdersFlow } from './OrdersScreens';
 import { colors } from '../../theme/theme';
 import { Text, TextInput } from '../../ui/Text';
 import { useSplashReady } from '../../shell/SplashReady';
@@ -284,7 +285,7 @@ export function ShopFlow({
   const [query, setQuery] = useState('');
   const [mode, setMode] = useState<'standard' | 'express'>('standard');
   const [menu, setMenu] = useState(false);
-  const [cartBack, setCartBack] = useState<'home' | 'category' | 'explore' | 'account'>('home');
+  const [cartBack, setCartBack] = useState<'home' | 'category' | 'explore' | 'account' | 'orders'>('home');
 
   const cartCount = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
   const add = (id: string, qty = 1) => setCart((current) => ({ ...current, [id]: (current[id] ?? 0) + qty }));
@@ -400,11 +401,20 @@ export function ShopFlow({
   }
   if (screen === 'orders') {
     return (
-      <InfoScreen
-        title="Orders"
-        body="Orders will show here once order history is connected."
-        tab={tab}
-        onTab={goTab}
+      <OrdersFlow
+        city={city}
+        cartCount={cartCount}
+        onDeliver={onDeliver}
+        onCart={() => {
+          setCartBack('orders');
+          setScreen('cart');
+        }}
+        onHome={() => {
+          setTab('home');
+          setScreen('home');
+        }}
+        onAdd={add}
+        footer={<TabBar tab={tab} onTab={goTab} />}
       />
     );
   }
