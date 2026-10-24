@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { AccountFlow } from './AccountScreens';
 import { OrdersFlow } from './OrdersScreens';
+import { StarterKitFlow, type StarterRequest } from '../starter-kit/StarterKitScreens';
 import { colors } from '../../theme/theme';
 import { Text, TextInput } from '../../ui/Text';
 import { useSplashReady } from '../../shell/SplashReady';
@@ -187,7 +188,7 @@ function glyph(body: string, color: string) {
 const CALENDAR = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="2.2" y="4.4" width="15.6" height="15" rx="2.8" fill="#FF4F18"/><rect x="4" y="8" width="12" height="9.4" rx="1.3" fill="#FFFFFF"/><rect x="6" y="2.4" width="1.8" height="3.6" rx="0.9" fill="#FF4F18"/><rect x="12.2" y="2.4" width="1.8" height="3.6" rx="0.9" fill="#FF4F18"/><path d="M6.2 10.6h7.6M6.2 13.2h7.6M6.2 15.6h4.8" stroke="#FFC7B8" stroke-width="1.15" stroke-linecap="round"/><circle cx="17.7" cy="16.6" r="4.5" fill="#FF4F18"/><circle cx="17.7" cy="16.6" r="3.15" fill="#FFFFFF"/><path d="M17.7 14.8v1.9l1.25.75" fill="none" stroke="#FF4F18" stroke-width="1.25" stroke-linecap="round"/></svg>`;
 const SCAN = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FF4F18" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8.2 3.2H4.6A1.4 1.4 0 0 0 3.2 4.6v3.6"/><path d="M15.8 3.2h3.6a1.4 1.4 0 0 1 1.4 1.4v3.6"/><path d="M8.2 20.8H4.6a1.4 1.4 0 0 1-1.4-1.4v-3.6"/><path d="M15.8 20.8h3.6a1.4 1.4 0 0 0 1.4-1.4v-3.6"/><rect x="7.4" y="7.4" width="3.6" height="3.6" rx="0.4" fill="#FF4F18" stroke="none"/><rect x="12.2" y="7.4" width="3.6" height="3.6" rx="0.4" fill="#FF4F18" stroke="none"/><rect x="7.4" y="12.2" width="3.6" height="3.6" rx="0.4" fill="#FF4F18" stroke="none"/><rect x="12.2" y="12.2" width="1.5" height="1.5" fill="#FF4F18" stroke="none"/><rect x="14.4" y="12.2" width="1.5" height="1.5" fill="#FF4F18" stroke="none"/><rect x="12.2" y="14.4" width="1.5" height="1.5" fill="#FF4F18" stroke="none"/><rect x="14.4" y="14.4" width="1.5" height="1.5" fill="#FF4F18" stroke="none"/></svg>`;
 
-type ShopTab = 'home' | 'explore' | 'lists' | 'orders' | 'account';
+type ShopTab = 'home' | 'explore' | 'starter' | 'orders' | 'account';
 
 function bannerFor(category: string) {
   if (['vegetables', 'fruits', 'leafy', 'chillies', 'fresh', 'onion', 'potato'].includes(category)) return PROMO_BANNERS[0];
@@ -207,23 +208,37 @@ function productsFor(filter: string) {
   return PRODUCTS.filter((item) => item.category === category);
 }
 
-function tabSvg(name: 'home' | 'explore' | 'orders' | 'lists' | 'account', active: boolean) {
+function tabSvg(name: 'home' | 'explore' | 'orders' | 'starter' | 'account', active: boolean) {
   const color = active ? colors.orange : '#9CA3AF';
-  const fill = active ? colors.orange : 'none';
-  const common = `xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"`;
+  const stroke = `fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"`;
   if (name === 'home') {
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${fill}" stroke="${color}" stroke-width="1.8" stroke-linejoin="round"><path d="M3.6 11.2 12 4.2l8.4 7V20a1.2 1.2 0 0 1-1.2 1.2h-4.6v-6.2H9.4v6.2H4.8A1.2 1.2 0 0 1 3.6 20v-8.8Z"/></svg>`;
+    const house = 'M3.6 11.2 12 4.2l8.4 7V20a1.2 1.2 0 0 1-1.2 1.2h-4.6v-6.2H9.4v6.2H4.8A1.2 1.2 0 0 1 3.6 20v-8.8Z';
+    const paint = active ? `fill="${color}"` : stroke;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path ${paint} d="${house}"/></svg>`;
   }
   if (name === 'explore') {
-    return `<svg ${common}><rect x="3.4" y="3.4" width="7.2" height="7.2" rx="1.8"/><rect x="13.4" y="3.4" width="7.2" height="7.2" rx="1.8"/><rect x="3.4" y="13.4" width="7.2" height="7.2" rx="1.8"/><rect x="13.4" y="13.4" width="7.2" height="7.2" rx="1.8"/></svg>`;
+    const paint = active ? `fill="${color}"` : stroke;
+    const squares = [[3.4, 3.4], [13.4, 3.4], [3.4, 13.4], [13.4, 13.4]]
+      .map(([x, y]) => `<rect x="${x}" y="${y}" width="7.2" height="7.2" rx="1.8" ${paint}/>`)
+      .join('');
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">${squares}</svg>`;
   }
   if (name === 'orders') {
-    return `<svg ${common}><path d="M3.6 8.2 12 4.4l8.4 3.8L12 12 3.6 8.2Z"/><path d="M3.6 8.2V16l8.4 3.8L20.4 16V8.2"/><path d="M12 12v7.8"/></svg>`;
+    if (active) {
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="${color}" d="M12 4.4 20.4 8.2V16L12 19.8 3.6 16V8.2Z"/><path d="M3.6 8.2 12 12l8.4-3.8M12 12v7.8" fill="none" stroke="${colors.white}" stroke-width="1.3" stroke-linejoin="round"/></svg>`;
+    }
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ${stroke}><path d="M3.6 8.2 12 4.4l8.4 3.8L12 12 3.6 8.2Z"/><path d="M3.6 8.2V16l8.4 3.8L20.4 16V8.2"/><path d="M12 12v7.8"/></svg>`;
   }
-  if (name === 'lists') {
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="4.7" rx="1.55" ry="1.05"/><path d="M12 5.75v1.2"/><path d="M4.7 16.2c.35-4.35 3.45-7.15 7.3-7.15s6.95 2.8 7.3 7.15"/><path d="M3.2 16.2h17.6"/><path d="M4.6 18.7h14.8"/></svg>`;
+  if (name === 'starter') {
+    if (active) {
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="${color}" fill-rule="evenodd" d="M9.3 9.1a2.7 2.7 0 0 1 5.4 0h-1.5a1.2 1.2 0 0 0-2.4 0z"/><path fill="${color}" d="M4 17.1a8 8 0 0 1 16 0z"/><rect x="2.2" y="18.4" width="19.6" height="2.8" rx="1.4" fill="${color}"/></svg>`;
+    }
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.3 9.1a2.7 2.7 0 0 1 5.4 0"/><path d="M4 17.1a8 8 0 0 1 16 0"/><path d="M2.2 19.8h19.6"/></svg>`;
   }
-  return `<svg ${common}><circle cx="12" cy="8" r="3.2" fill="${fill}"/><path d="M5.6 19.6c.8-3.2 3.1-4.8 6.4-4.8s5.6 1.6 6.4 4.8"/></svg>`;
+  if (active) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2" fill="${color}"/><path fill="${color}" d="M6.2 19.8c.7-3.3 2.9-5 5.8-5s5.1 1.7 5.8 5Z"/></svg>`;
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ${stroke}><circle cx="12" cy="8" r="3.2"/><path d="M5.6 19.6c.8-3.2 3.1-4.8 6.4-4.8s5.6 1.6 6.4 4.8"/></svg>`;
 }
 const HEART =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FF4F18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19.2s-6.2-3.9-6.2-8A3.5 3.5 0 0 1 12 8.3a3.5 3.5 0 0 1 6.2 2.9c0 4.1-6.2 8-6.2 8Z"/></svg>';
@@ -273,10 +288,11 @@ export function ShopFlow({
   onEditDetails?: () => void;
   onEditOutlet?: () => void;
 }) {
-  const [screen, setScreen] = useState<'home' | 'explore' | 'category' | 'product' | 'cart' | 'list' | 'orders' | 'account' | 'alerts'>('home');
+  const [screen, setScreen] = useState<'home' | 'explore' | 'category' | 'product' | 'cart' | 'starter' | 'orders' | 'account' | 'alerts'>('home');
   const [tab, setTab] = useState<ShopTab>('home');
   const [productId, setProductId] = useState('tomato');
-  const [backTo, setBackTo] = useState<'home' | 'category' | 'list' | 'explore'>('home');
+  const [backTo, setBackTo] = useState<'home' | 'category' | 'explore'>('home');
+  const [starterRequests, setStarterRequests] = useState<StarterRequest[]>([]);
   const [filter, setFilter] = useState('vegetables');
   const [browse, setBrowse] = useState(false);
   const [cart, setCart] = useState<Record<string, number>>({});
@@ -285,7 +301,7 @@ export function ShopFlow({
   const [query, setQuery] = useState('');
   const [mode, setMode] = useState<'standard' | 'express'>('standard');
   const [menu, setMenu] = useState(false);
-  const [cartBack, setCartBack] = useState<'home' | 'category' | 'explore' | 'account' | 'orders'>('home');
+  const [cartBack, setCartBack] = useState<'home' | 'category' | 'explore' | 'account' | 'orders' | 'starter'>('home');
 
   const cartCount = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
   const add = (id: string, qty = 1) => setCart((current) => ({ ...current, [id]: (current[id] ?? 0) + qty }));
@@ -298,7 +314,7 @@ export function ShopFlow({
     });
   const toggleSaved = (id: string) => setSaved((current) => ({ ...current, [id]: !current[id] }));
 
-  const openProduct = (id: string, from: 'home' | 'category' | 'list' | 'explore') => {
+  const openProduct = (id: string, from: 'home' | 'category' | 'explore') => {
     setProductId(id);
     setBackTo(from);
     setScreen('product');
@@ -306,7 +322,7 @@ export function ShopFlow({
   const openCategory = (id: string) => {
     setFilter(id);
     setBrowse(false);
-    setTab((current) => (current === 'explore' ? 'explore' : 'home'));
+    setTab((current) => (current === 'explore' || current === 'starter' ? current : 'home'));
     setScreen('category');
   };
   const openBrowse = () => {
@@ -321,7 +337,7 @@ export function ShopFlow({
       setBrowse(false);
       setScreen('explore');
     }
-    if (next === 'lists') setScreen('list');
+    if (next === 'starter') setScreen('starter');
     if (next === 'orders') setScreen('orders');
     if (next === 'account') setScreen('account');
   };
@@ -337,6 +353,10 @@ export function ShopFlow({
         onBack={() => {
           if (tab === 'explore') {
             setScreen('explore');
+            return;
+          }
+          if (tab === 'starter') {
+            setScreen('starter');
             return;
           }
           setTab('home');
@@ -388,14 +408,24 @@ export function ShopFlow({
       />
     );
   }
-  if (screen === 'list') {
+  if (screen === 'starter') {
     return (
-      <ListScreen
-        saved={saved}
-        tab={tab}
-        onTab={goTab}
-        onOpen={(id) => openProduct(id, 'list')}
-        onToggle={toggleSaved}
+      <StarterKitFlow
+        city={city}
+        cartCount={cartCount}
+        requests={starterRequests}
+        onSubmit={(request) => setStarterRequests((current) => [request, ...current])}
+        onDeliver={onDeliver}
+        onCart={() => {
+          setCartBack('starter');
+          setScreen('cart');
+        }}
+        onShop={() => {
+          setTab('home');
+          setScreen('home');
+        }}
+        onOpenCategory={openCategory}
+        footer={<TabBar tab={tab} onTab={goTab} />}
       />
     );
   }
@@ -511,7 +541,7 @@ export function ShopFlow({
             <Text style={styles.menuTitle}>Menu</Text>
             {([
               ['Shop', 'home'],
-              ['Starter', 'lists'],
+              ['Starter Kit', 'starter'],
               ['Orders', 'orders'],
               ['Account', 'account'],
             ] as const).map(([label, id]) => (
@@ -1667,47 +1697,6 @@ function Total({ label, value, strong }: { label: string; value: string; strong?
   );
 }
 
-function ListScreen({
-  saved,
-  tab,
-  onTab,
-  onOpen,
-  onToggle,
-}: {
-  saved: Record<string, boolean>;
-  tab: ShopTab;
-  onTab: (tab: ShopTab) => void;
-  onOpen: (id: string) => void;
-  onToggle: (id: string) => void;
-}) {
-  const items = PRODUCTS.filter((item) => saved[item.id]);
-  return (
-    <View style={styles.screen}>
-      <View style={styles.nav}>
-        <Text style={styles.navTitle}>Starter</Text>
-        <View style={{ width: 28 }} />
-      </View>
-      <ScrollView contentContainerStyle={{ paddingBottom: 16, flexGrow: 1 }}>
-        {items.map((item) => (
-          <Pressable key={item.id} style={styles.row} onPress={() => onOpen(item.id)}>
-            <Image source={item.image} style={styles.rowImage} resizeMode="contain" />
-            <View style={styles.rowBody}>
-              <Text style={styles.rowName}>{item.name}</Text>
-              <Text style={styles.rowUnit}>{item.unit}</Text>
-              <Text style={styles.rowPrice}>₹{item.price}</Text>
-            </View>
-            <TouchableOpacity onPress={() => onToggle(item.id)} accessibilityLabel={`Remove ${item.name}`}>
-              <Icon svg={HEART_ON} size={22} />
-            </TouchableOpacity>
-          </Pressable>
-        ))}
-        {!items.length ? <Text style={styles.emptyCopy}>Save a product with the heart to keep it here.</Text> : null}
-      </ScrollView>
-      <TabBar tab={tab} onTab={onTab} />
-    </View>
-  );
-}
-
 function InfoScreen({
   title,
   body,
@@ -1748,10 +1737,10 @@ function InfoScreen({
 }
 
 function TabBar({ tab, onTab }: { tab: ShopTab; onTab: (tab: ShopTab) => void }) {
-  const items: Array<{ id: ShopTab; label: string; icon: 'home' | 'explore' | 'lists' | 'orders' | 'account' }> = [
+  const items: Array<{ id: ShopTab; label: string; icon: 'home' | 'explore' | 'starter' | 'orders' | 'account' }> = [
     { id: 'home', label: 'Shop', icon: 'home' },
     { id: 'explore', label: 'Explore', icon: 'explore' },
-    { id: 'lists', label: 'Starter', icon: 'lists' },
+    { id: 'starter', label: 'Starter Kit', icon: 'starter' },
     { id: 'orders', label: 'Orders', icon: 'orders' },
     { id: 'account', label: 'Account', icon: 'account' },
   ];
@@ -1760,7 +1749,7 @@ function TabBar({ tab, onTab }: { tab: ShopTab; onTab: (tab: ShopTab) => void })
       {items.map((item) => (
         <TouchableOpacity key={item.id} style={styles.tab} onPress={() => onTab(item.id)} accessibilityRole="button" accessibilityLabel={item.label} accessibilityState={{ selected: tab === item.id }}>
           <Icon svg={tabSvg(item.icon, tab === item.id)} size={26} />
-          <Text style={[styles.tabLabel, tab === item.id && styles.tabOn]}>{item.label}</Text>
+          <Text numberOfLines={1} style={[styles.tabLabel, tab === item.id && styles.tabOn]}>{item.label}</Text>
         </TouchableOpacity>
       ))}
     </View>
@@ -1811,7 +1800,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   tab: { flex: 1, alignItems: 'center', gap: 4 },
-  tabLabel: { fontSize: 12, fontWeight: '600', color: '#9CA3AF' },
+  tabLabel: { fontSize: 11, lineHeight: 13, fontWeight: '600', color: '#9CA3AF', textAlign: 'center' },
   tabOn: { color: ORANGE, fontWeight: '700' },
   nav: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 },
   back: { fontSize: 32, lineHeight: 32, color: INK, width: 28 },
