@@ -53,6 +53,8 @@ type MenuCategory = {
   image: ImageSourcePropType;
 };
 
+const BUSINESS_BANNER = require('../../../assets/Pouplar_StarkerKit_Banner_Restaurants_webp.webp');
+
 const BUSINESSES: Business[] = [
   {
     id: 'restaurant',
@@ -62,7 +64,7 @@ const BUSINESSES: Business[] = [
     setupBody: 'End-to-end ingredients and essentials to start and run your restaurant.',
     kitHeading: 'Popular Kits for Restaurants',
     image: require('../../../assets/starter-kit/business/restaurant.png'),
-    wide: require('../../../assets/Pouplar_StarkerKit_Banner_Restaurants_webp.webp'),
+    wide: BUSINESS_BANNER,
   },
   {
     id: 'cloud-kitchen',
@@ -72,6 +74,7 @@ const BUSINESSES: Business[] = [
     setupBody: 'End-to-end ingredients and essentials to start and run your cloud kitchen.',
     kitHeading: 'Popular Kits for Cloud Kitchens',
     image: require('../../../assets/starter-kit/business/cloud-kitchen.png'),
+    wide: BUSINESS_BANNER,
   },
   {
     id: 'cafe',
@@ -81,6 +84,7 @@ const BUSINESSES: Business[] = [
     setupBody: 'End-to-end ingredients and essentials to start and run your cafe.',
     kitHeading: 'Popular Kits for Cafes',
     image: require('../../../assets/starter-kit/business/cafe.png'),
+    wide: BUSINESS_BANNER,
   },
   {
     id: 'bakery',
@@ -90,6 +94,7 @@ const BUSINESSES: Business[] = [
     setupBody: 'End-to-end ingredients and essentials to start and run your bakery.',
     kitHeading: 'Popular Kits for Bakeries',
     image: require('../../../assets/starter-kit/business/bakery.png'),
+    wide: BUSINESS_BANNER,
   },
   {
     id: 'hotel',
@@ -99,6 +104,7 @@ const BUSINESSES: Business[] = [
     setupBody: 'End-to-end ingredients and essentials to start and run your hotel kitchen.',
     kitHeading: 'Popular Kits for Hotels',
     image: require('../../../assets/starter-kit/business/hotel.png'),
+    wide: BUSINESS_BANNER,
   },
 ];
 
@@ -642,9 +648,9 @@ function HomeScreen({
         <HeroCarousel width={bannerWidth} height={heroHeight} onExplore={onExplore} />
         <Text style={styles.sectionTitle}>Choose your business type</Text>
         <Text style={styles.sectionSub}>Pick a starter kit tailored for your needs</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.typeRow}>
+        <View style={styles.typeRow}>
           {BUSINESSES.map((item) => (
-            <Pressable key={item.id} style={[styles.typeItem, compact && styles.typeItemCompact]} onPress={() => onBusiness(item.id)} accessibilityRole="button" accessibilityLabel={item.label} testID={`starter-business-${item.id}`}>
+            <Pressable key={item.id} style={styles.typeItem} onPress={() => onBusiness(item.id)} accessibilityRole="button" accessibilityLabel={item.label} testID={`starter-business-${item.id}`}>
               <View style={[styles.typePhoto, item.id === 'restaurant' && styles.typePhotoOn]}>
                 <Image source={item.image} style={styles.typeImage} resizeMode="cover" />
               </View>
@@ -652,7 +658,7 @@ function HomeScreen({
               <Text style={[styles.typeCaption, compact && styles.typeCaptionCompact]} numberOfLines={2}>{item.caption}</Text>
             </Pressable>
           ))}
-        </ScrollView>
+        </View>
         <View style={styles.sectionRow}>
           <Text style={styles.sectionTitle}>Popular Starter Kits</Text>
           <Pressable onPress={onSeeAll} accessibilityRole="button" accessibilityLabel="See all popular starter kits">
@@ -1312,16 +1318,15 @@ const styles = StyleSheet.create({
   sectionPad: { paddingHorizontal: 16 },
   sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingRight: 16 },
   seeAll: { color: ORANGE, fontWeight: '700', fontSize: 14, marginTop: 6 },
-  typeRow: { flexDirection: 'row', paddingHorizontal: 16, paddingTop: 10, gap: 12 },
-  typeItem: { width: 84, alignItems: 'center' },
-  typeItemCompact: { width: 72 },
-  typePhoto: { width: 64, height: 64, borderRadius: 16, overflow: 'hidden', backgroundColor: FIELD, borderWidth: 1, borderColor: LINE },
+  typeRow: { flexDirection: 'row', paddingHorizontal: 12, paddingTop: 10, gap: 6 },
+  typeItem: { flex: 1, minWidth: 0, alignItems: 'center', paddingHorizontal: 1 },
+  typePhoto: { width: '100%', aspectRatio: 1, borderRadius: 14, overflow: 'hidden', backgroundColor: FIELD, borderWidth: 1, borderColor: LINE },
   typePhotoOn: { borderWidth: 1.5, borderColor: ORANGE },
   typeImage: { width: '100%', height: '100%' },
-  typeLabel: { marginTop: 6, fontSize: 12, lineHeight: 15, fontWeight: '700', color: INK, textAlign: 'center' },
-  typeLabelCompact: { fontSize: 10, lineHeight: 12 },
-  typeCaption: { marginTop: 1, fontSize: 10, lineHeight: 13, color: MUTED, textAlign: 'center' },
-  typeCaptionCompact: { fontSize: 9, lineHeight: 11 },
+  typeLabel: { marginTop: 6, fontSize: 11, lineHeight: 13, fontWeight: '700', color: INK, textAlign: 'center' },
+  typeLabelCompact: { fontSize: 9, lineHeight: 11 },
+  typeCaption: { marginTop: 1, fontSize: 9, lineHeight: 11, color: MUTED, textAlign: 'center' },
+  typeCaptionCompact: { fontSize: 8, lineHeight: 10 },
   cardRow: { flexDirection: 'row', paddingHorizontal: 16, paddingTop: 8, gap: 8 },
   kitCard: { flex: 1, minWidth: 0, backgroundColor: WHITE, borderRadius: 16, borderWidth: 1, borderColor: LINE, padding: 8 },
   kitCardPhoto: { width: '100%', aspectRatio: 1.12, borderRadius: 12, backgroundColor: FIELD, overflow: 'hidden' },
@@ -1339,7 +1344,7 @@ const styles = StyleSheet.create({
   feature: { flex: 1, alignItems: 'center', paddingHorizontal: 2 },
   featureIcon: { width: 32, height: 32, borderRadius: 16, backgroundColor: SELECTED, alignItems: 'center', justifyContent: 'center' },
   featureLabel: { marginTop: 4, fontSize: 11, lineHeight: 13, fontWeight: '600', color: INK, textAlign: 'center' },
-  setupCopy: { flex: 0, flexGrow: 0, width: '42%', alignSelf: 'flex-start', justifyContent: 'flex-start', paddingTop: 14, paddingRight: 0 },
+  setupCopy: { flex: 0, flexGrow: 0, width: '50%', alignSelf: 'flex-start', justifyContent: 'flex-start', paddingTop: 14, paddingRight: 0 },
   setupCopyCompact: { width: '52%' },
   setupTitle: { fontSize: 20, lineHeight: 24, fontWeight: '800', color: INK },
   setupTitleCompact: { fontSize: 16, lineHeight: 19 },
